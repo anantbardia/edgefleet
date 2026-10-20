@@ -23,9 +23,11 @@ def upgrade() -> None:
         sa.Column('id', sa.String(36), primary_key=True),
         sa.Column('email', sa.String(255), unique=True, nullable=False, index=True),
         sa.Column('hashed_password', sa.String(255), nullable=False),
+        sa.Column('full_name', sa.String(255), default='', nullable=False),
         sa.Column('role', sa.String(20), default='viewer', nullable=False),
         sa.Column('is_active', sa.Boolean(), default=True, nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+        sa.Column('last_login', sa.DateTime(timezone=True), nullable=True),
     )
 
     # Devices table
