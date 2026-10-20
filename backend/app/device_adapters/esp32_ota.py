@@ -66,13 +66,19 @@ class ESP32OTAAdapter(BaseDeviceAdapter):
             # 1. State: TRANSFERRING
             await on_progress("TRANSFERRING", {"detail": "Dispatching OTA command to ESP32 node via MQTT"}, None)
 
-            # Build OTA command payload
+            # Build OTA command payload with full download URL
+            gateway_base = getattr(settings, "GATEWAY_BASE_URL", "").rstrip("/")
+            if not gateway_base:
+                host = settings.MQTT_HOST if (settings.MQTT_HOST and settings.MQTT_HOST not in ("localhost", "127.0.0.1")) else "192.168.137.99"
+                gateway_base = f"http://{host}"
+            firmware_url = f"{gateway_base}/api/firmware/{release.id}/download"
+
             command_payload = {
                 "schema_version": "1.0",
                 "command": "ota_update",
                 "deployment_id": dep_id,
                 "release_id": str(release.id),
-                "firmware_url": f"/api/firmware/{release.id}/download",
+                "firmware_url": firmware_url,
                 "expected_sha256": release.sha256,
                 "expected_version": release.version,
                 "target_device": device.device_id,
