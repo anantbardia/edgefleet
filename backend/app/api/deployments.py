@@ -91,10 +91,15 @@ async def preflight_check(
         # Board variant check
         if release.target_boards and device.board_variant:
             if not is_board_compatible(device.board_variant, release.target_boards):
-                errors.append(
-                    f"Board variant '{device.board_variant}' not in target boards: "
-                    f"{release.target_boards}"
-                )
+                if device.mcu_family == "esp32":
+                    warnings.append(
+                        f"Board variant '{device.board_variant}' differs from target boards: {release.target_boards}"
+                    )
+                else:
+                    errors.append(
+                        f"Board variant '{device.board_variant}' not in target boards: "
+                        f"{release.target_boards}"
+                    )
 
         # Approval check
         if not release.is_approved:

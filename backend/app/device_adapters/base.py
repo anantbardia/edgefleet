@@ -80,6 +80,10 @@ def is_board_compatible(device_board: str | None, target_boards: Any) -> bool:
         if dev_variants & tgt_variants:
             return True
 
+    # Allow cross-variant upgrades between ESP32 family chips (e.g. C3, S3, WROOM)
+    if ("esp32" in dev or "c3" in dev or "s3" in dev) and any("esp32" in t or "c3" in t or "s3" in t for t in normalized_targets):
+        return True
+
     return False
 
 
