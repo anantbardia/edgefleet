@@ -1,13 +1,13 @@
 /*
- * EdgeFleet — ESP32-S3 Secure Wi-Fi & FOTA Node Firmware
- * Target: ESP32-S3 (ESP32-S3 DevKitC-1, WROOM-1, Zero, etc.)
+ * EdgeFleet — ESP32-C3 Secure Wi-Fi & FOTA Node Firmware
+ * Target: ESP32-C3 (ESP32-C3 Mini, SuperMini, DevKitM-1, etc.)
  *
  * Requirements:
  * - Arduino IDE with ESP32 board package (by Espressif)
  * - Library: PubSubClient (install from Arduino Library Manager)
- * - Board: "ESP32S3 Dev Module" (or your specific S3 board)
+ * - Board: "ESP32C3 Dev Module" (or "LOLIN C3 Mini")
  * - Partition Scheme: Any scheme with OTA (e.g. "Minimal SPIFFS (1.9MB APP with OTA/190KB SPIFFS)"
- *                     or "8MB with spiffs (3MB APP/1.5MB SPIFFS)" depending on flash size)
+ *                     or "Default 4MB with spiffs")
  */
 
 #include <WiFi.h>
@@ -25,7 +25,7 @@ const char* GATEWAY_HOST      = "10.202.94.199";
 const int   MQTT_PORT         = 1883;
 
 // Device Identity
-const char* DEVICE_ID         = "esp32-s3-01"; // Registered device identifier
+const char* DEVICE_ID         = "esp32-c3-01"; // Registered device identifier
 const char* BOARD_VARIANT     = "ESP32-C3";
 const char* CURRENT_VERSION   = "1.1.0"; // Version 1.1.0: Active Wi-Fi Blink
 
@@ -154,7 +154,7 @@ void performOTA(String downloadUrl, String deploymentId) {
   mqttClient.loop();
   delay(1200);
 
-  Serial.println("[OTA Success] Rebooting ESP32-S3 into new firmware partition!");
+  Serial.println("[OTA Success] Rebooting ESP32-C3 into new firmware partition!");
   ESP.restart();
 }
 
@@ -228,8 +228,9 @@ void connectMQTT() {
   if (mqttClient.connect(DEVICE_ID, topicStatus.c_str(), 1, true, lwtPayload)) {
     Serial.println("[MQTT] Connected successfully!");
 
-    // Subscribe to commands topic
+    // Subscribe to commands topic (both primary and legacy alias)
     mqttClient.subscribe(topicCommands.c_str(), 1);
+    mqttClient.subscribe("edgefleet/v1/devices/esp32-s3-01/commands", 1);
     Serial.printf("[MQTT] Subscribed to %s\n", topicCommands.c_str());
 
     // Send online status announcement
@@ -249,7 +250,7 @@ void sendTelemetry() {
   if (!mqttClient.connected()) return;
 
   // Read internal sensors or simulated telemetry
-  float tempC = temperatureRead(); // ESP32-S3 internal temperature sensor
+  float tempC = temperatureRead(); // ESP32-C3 internal temperature sensor
   long rssi = WiFi.RSSI();
   uint32_t freeHeap = ESP.getFreeHeap();
   unsigned long uptime = millis() / 1000;
@@ -269,7 +270,7 @@ void setup() {
   Serial.begin(115200);
   delay(1000);
   Serial.println("\n==================================================");
-  Serial.printf("  EdgeFleet ESP32-S3 Node Firmware v%s\n", CURRENT_VERSION);
+  Serial.printf("  EdgeFleet ESP32-C3 Node Firmware v%s\n", CURRENT_VERSION);
   Serial.printf("  Device ID: %s | Board: %s\n", DEVICE_ID, BOARD_VARIANT);
   Serial.println("==================================================");
 

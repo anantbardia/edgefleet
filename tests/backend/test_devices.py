@@ -28,7 +28,7 @@ async def test_register_device_admin(client: AsyncClient, admin_headers):
         "device_id": "esp32-created",
         "name": "Created ESP32",
         "mcu_family": "esp32",
-        "board_variant": "esp32-s3-wroom-1",
+        "board_variant": "esp32-c3-devkitm-1",
     }
     resp = await client.post("/api/devices", json=payload, headers=admin_headers)
     assert resp.status_code == 201

@@ -106,7 +106,7 @@ class Simulator:
 
         self.devices: List[MockDevice] = [
             MockDevice("esp32-001", "ESP32 Lab Environment Node", "esp32", "esp32-wroom-32", "1.0.0", "192.168.1.101"),
-            MockDevice("esp32-002", "ESP32 Production Line Sensor", "esp32", "esp32-s3-wroom-1", "1.1.0", "192.168.1.102"),
+            MockDevice("esp32-002", "ESP32 Production Line Sensor", "esp32", "esp32-c3-super-mini", "1.1.0", "192.168.1.102"),
             MockDevice("esp32-003", "ESP32 Warehouse Monitor", "esp32", "esp32-c3-devkitm-1", "1.0.0", "192.168.1.103"),
             MockDevice("uno-001", "Arduino Uno Telemetry Logger", "arduino_uno", "atmega328p", "0.9.0", "serial:/dev/ttyACM0"),
         ]

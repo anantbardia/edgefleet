@@ -25,7 +25,7 @@ export const FirmwareReleases: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [version, setVersion] = useState('');
   const [mcuFamily, setMcuFamily] = useState('esp32');
-  const [targetBoards, setTargetBoards] = useState('esp32-wroom-32, esp32-s3-wroom-1');
+  const [targetBoards, setTargetBoards] = useState('ESP32-C3, esp32-c3-devkitm-1, esp32-wroom-32');
   const [releaseNotes, setReleaseNotes] = useState('');
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -277,7 +277,7 @@ export const FirmwareReleases: React.FC = () => {
                     onChange={(e) => {
                       setMcuFamily(e.target.value);
                       if (e.target.value === 'arduino_uno') setTargetBoards('ATmega328P, uno');
-                      else setTargetBoards('esp32-wroom-32, esp32-s3-wroom-1');
+                      else setTargetBoards('ESP32-C3, esp32-c3-devkitm-1, esp32-wroom-32');
                     }}
                     className="w-full bg-[#070b14] border border-fleet-border rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500"
                   >

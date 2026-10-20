@@ -33,8 +33,11 @@ async def handle_telemetry(device_id: str, payload: Dict[str, Any]):
                 ts = datetime.now(timezone.utc)
 
         async with async_session_factory() as db:
-            # Check device exists
-            res = await db.execute(select(Device).where(Device.device_id == device_id))
+            # Check device exists (support alias between esp32-s3-01 and esp32-c3-01)
+            target_ids = [device_id]
+            if device_id in ("esp32-s3-01", "esp32-c3-01"):
+                target_ids = ["esp32-c3-01", "esp32-s3-01"]
+            res = await db.execute(select(Device).where(Device.device_id.in_(target_ids)))
             dev = res.scalar_one_or_none()
             if not dev:
                 logger.warning("Received telemetry for unregistered device: %s. Auto-registering.", device_id)
@@ -43,6 +46,7 @@ async def handle_telemetry(device_id: str, payload: Dict[str, Any]):
                     device_id=device_id,
                     name=device_id,
                     mcu_family=mcu,
+                    board_variant="ESP32-C3" if "esp32" in device_id.lower() else "ATmega328P",
                     firmware_version=firmware_version or "1.0.0",
                     is_online=True,
                     last_seen=datetime.now(timezone.utc),
@@ -75,7 +79,10 @@ async def handle_status(device_id: str, payload: Dict[str, Any]):
         reset_reason = payload.get("reset_reason")
 
         async with async_session_factory() as db:
-            res = await db.execute(select(Device).where(Device.device_id == device_id))
+            target_ids = [device_id]
+            if device_id in ("esp32-s3-01", "esp32-c3-01"):
+                target_ids = ["esp32-c3-01", "esp32-s3-01"]
+            res = await db.execute(select(Device).where(Device.device_id.in_(target_ids)))
             dev = res.scalar_one_or_none()
             if not dev:
                 logger.warning("Status report for unregistered device: %s", device_id)
@@ -95,7 +102,7 @@ async def handle_status(device_id: str, payload: Dict[str, Any]):
                 update_fields["board_variant"] = str(board_var)
 
             await db.execute(
-                update(Device).where(Device.device_id == device_id).values(**update_fields)
+                update(Device).where(Device.id == dev.id).values(**update_fields)
             )
             await db.commit()
 
