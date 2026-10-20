@@ -8,7 +8,7 @@ from pydantic import BaseModel, EmailStr, Field
 
 class UserLogin(BaseModel):
     """Login request."""
-    email: EmailStr
+    email: str = Field(..., min_length=3, max_length=255)
     password: str = Field(min_length=8, max_length=128)
 
 
@@ -39,7 +39,7 @@ class UserResponse(BaseModel):
 
 class UserCreate(BaseModel):
     """Create a new user (admin only)."""
-    email: EmailStr
+    email: str = Field(..., min_length=3, max_length=255)
     password: str = Field(min_length=8, max_length=128)
     full_name: str = Field(max_length=255)
     role: str = Field(default="viewer", pattern="^(viewer|operator|admin)$")

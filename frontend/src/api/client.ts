@@ -81,7 +81,15 @@ class ApiClient {
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({ detail: response.statusText }));
-      throw new Error(err.detail || 'An unexpected API error occurred');
+      let msg = 'An unexpected API error occurred';
+      if (typeof err.detail === 'string') {
+        msg = err.detail;
+      } else if (Array.isArray(err.detail)) {
+        msg = err.detail.map((e: any) => e.msg || e.message || JSON.stringify(e)).join(', ');
+      } else if (err.detail && typeof err.detail === 'object') {
+        msg = err.detail.msg || JSON.stringify(err.detail);
+      }
+      throw new Error(msg);
     }
 
     return response.json();
