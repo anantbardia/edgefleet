@@ -12,6 +12,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 INSTALL_DIR="/opt/edgefleet"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FIRMWARE_DIR="/var/lib/edgefleet/firmware"
 BACKUP_DIR="/var/lib/edgefleet/backups"
 LOG_DIR="/var/log/edgefleet"
@@ -93,15 +94,15 @@ cd "$INSTALL_DIR/backend"
 sudo -u edgefleet "$INSTALL_DIR/.venv/bin/alembic" upgrade head || true
 
 # Deploy systemd units
-cp "$(dirname "$0")/edgefleet-backend.service" /etc/systemd/system/
-cp "$(dirname "$0")/edgefleet-sync.service" /etc/systemd/system/
+cp "$SCRIPT_DIR/edgefleet-backend.service" /etc/systemd/system/
+cp "$SCRIPT_DIR/edgefleet-sync.service" /etc/systemd/system/
 
 # Deploy Mosquitto config
-cp "$(dirname "$0")/mosquitto-edgefleet.conf" /etc/mosquitto/conf.d/
+cp "$SCRIPT_DIR/mosquitto-edgefleet.conf" /etc/mosquitto/conf.d/
 systemctl restart mosquitto
 
 # Deploy Nginx config
-cp "$(dirname "$0")/nginx-edgefleet.conf" /etc/nginx/sites-available/edgefleet.conf
+cp "$SCRIPT_DIR/nginx-edgefleet.conf" /etc/nginx/sites-available/edgefleet.conf
 ln -sf /etc/nginx/sites-available/edgefleet.conf /etc/nginx/sites-enabled/default
 nginx -t
 systemctl reload nginx

@@ -316,3 +316,30 @@ class CloudSyncService:
 
 
 cloud_sync_service = CloudSyncService()
+
+
+if __name__ == "__main__":
+    import asyncio
+    from app.database.session import async_session_factory, init_db
+
+    async def run_standalone_sync():
+        await init_db()
+        logger.info("Starting standalone EdgeFleet cloud sync worker...")
+        while True:
+            try:
+                if settings.CLOUD_ENABLED and settings.CLOUD_API_URL:
+                    async with async_session_factory() as db:
+                        await cloud_sync_service.sync_batch(db)
+                        await cloud_sync_service.pull_pending_deployments(db)
+                        await cloud_sync_service.prune_old_events(db)
+                await asyncio.sleep(settings.CLOUD_SYNC_INTERVAL_SECONDS)
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.error("Error in sync worker: %s", e)
+                await asyncio.sleep(5)
+
+    try:
+        asyncio.run(run_standalone_sync())
+    except KeyboardInterrupt:
+        pass
