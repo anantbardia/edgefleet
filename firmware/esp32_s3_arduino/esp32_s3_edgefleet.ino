@@ -25,12 +25,13 @@ const char* GATEWAY_HOST      = "10.202.94.199";
 const int   MQTT_PORT         = 1883;
 
 // Device Identity
-const char* DEVICE_ID         = "esp32-s3-01";
-const char* BOARD_VARIANT     = "ESP32-S3";
-const char* CURRENT_VERSION   = "1.0.0"; // Increment when creating new releases (e.g., 1.1.0)
+const char* DEVICE_ID         = "esp32-s3-01"; // Registered device identifier
+const char* BOARD_VARIANT     = "ESP32-C3";
+const char* CURRENT_VERSION   = "1.1.0"; // Version 1.1.0: Active Wi-Fi Blink
 
-// Optional on-board status LED (Pin 2, Pin 13, or RGB LED on GPIO 48 on official S3 DevKit)
-#define STATUS_LED_PIN        2 // Change to match your board, or leave as -1 if none
+// ESP32-C3 Mini onboard LED: GPIO 8 (SuperMini) or GPIO 7 (LOLIN C3 Mini)
+#define STATUS_LED_PIN        8
+#define ALT_LED_PIN           7
 
 // ── Global Objects ───────────────────────────────────────────────────────────
 WiFiClient espClient;
@@ -276,6 +277,10 @@ void setup() {
     pinMode(STATUS_LED_PIN, OUTPUT);
     digitalWrite(STATUS_LED_PIN, HIGH);
   }
+  if (ALT_LED_PIN >= 0) {
+    pinMode(ALT_LED_PIN, OUTPUT);
+    digitalWrite(ALT_LED_PIN, HIGH);
+  }
 
   setupTopics();
 
@@ -302,14 +307,17 @@ void loop() {
     mqttClient.loop();
   }
 
+  // Active Onboard LED Blink (Every 500ms)
+  static unsigned long lastLedBlink = 0;
+  if (millis() - lastLedBlink > 500) {
+    lastLedBlink = millis();
+    if (STATUS_LED_PIN >= 0) digitalWrite(STATUS_LED_PIN, !digitalRead(STATUS_LED_PIN));
+    if (ALT_LED_PIN >= 0)    digitalWrite(ALT_LED_PIN, !digitalRead(ALT_LED_PIN));
+  }
+
   // Periodic Telemetry
   if (!otaInProgress && (millis() - lastTelemetryTime > TELEMETRY_INTERVAL)) {
     lastTelemetryTime = millis();
     sendTelemetry();
-
-    // Toggle status LED
-    if (STATUS_LED_PIN >= 0) {
-      digitalWrite(STATUS_LED_PIN, !digitalRead(STATUS_LED_PIN));
-    }
   }
 }
