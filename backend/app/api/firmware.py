@@ -8,11 +8,12 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, Query, Request, UploadFile, File, Form
 from fastapi.responses import FileResponse
-from sqlalchemy import func, select
+from sqlalchemy import func, select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import require_admin, require_operator, require_viewer
 from app.config import settings
+from app.models.deployment import DeploymentJob
 from app.core.exceptions import (
     DuplicateResourceError,
     FirmwareNotFoundError,
@@ -252,3 +253,35 @@ async def download_firmware(
         filename=release.original_filename,
         media_type="application/octet-stream",
     )
+
+
+@router.delete("/{release_id}", status_code=204)
+async def delete_release(
+    release_id: str,
+    user: User = Depends(require_operator),
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete a firmware release artifact and database record."""
+    result = await db.execute(
+        select(FirmwareRelease).where(FirmwareRelease.id == release_id)
+    )
+    release = result.scalar_one_or_none()
+    if not release:
+        raise FirmwareNotFoundError(release_id)
+
+    # Delete any related deployment jobs to prevent foreign key errors
+    await db.execute(
+        delete(DeploymentJob).where(DeploymentJob.release_id == release_id)
+    )
+
+    # Remove underlying binary file if present
+    try:
+        file_path = Path(release.file_path)
+        if file_path.exists():
+            file_path.unlink()
+    except Exception:
+        pass
+
+    await db.delete(release)
+    await db.commit()
+    return None

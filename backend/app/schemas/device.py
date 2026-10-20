@@ -19,6 +19,7 @@ class DeviceCreate(BaseModel):
 
 class DeviceUpdate(BaseModel):
     """Update device metadata."""
+    device_id: Optional[str] = Field(None, min_length=1, max_length=128, pattern="^[a-zA-Z0-9_-]+$")
     name: Optional[str] = Field(None, max_length=255)
     board_variant: Optional[str] = Field(None, max_length=100)
     sensor_types: Optional[List[str]] = None

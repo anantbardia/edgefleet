@@ -13,6 +13,7 @@ import {
   FileCode,
   ShieldCheck,
   AlertCircle,
+  Trash2,
 } from 'lucide-react';
 
 export const FirmwareReleases: React.FC = () => {
@@ -61,6 +62,18 @@ export const FirmwareReleases: React.FC = () => {
       loadReleases();
     } catch (err: any) {
       alert(`Failed updating approval: ${err.message}`);
+    }
+  };
+
+  const handleDeleteRelease = async (releaseId: string, version: string) => {
+    if (!window.confirm(`Are you sure you want to permanently delete firmware release v${version}?`)) {
+      return;
+    }
+    try {
+      await api.firmware.delete(releaseId);
+      loadReleases();
+    } catch (err: any) {
+      alert(`Failed to delete firmware release: ${err.message}`);
     }
   };
 
@@ -197,22 +210,35 @@ export const FirmwareReleases: React.FC = () => {
                 </div>
               </div>
 
-              {/* Card Footer: Metadata and Approval action */}
+              {/* Card Footer: Metadata, Delete, and Approval action */}
               <div className="pt-3 border-t border-fleet-border/70 flex items-center justify-between text-[11px] text-slate-400">
                 <span>{(rel.file_size / 1024).toFixed(1)} KB</span>
 
-                {hasRole('admin') && (
-                  <button
-                    onClick={() => handleToggleApproval(rel.id, rel.is_approved)}
-                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
-                      rel.is_approved
-                        ? 'bg-rose-950/60 hover:bg-rose-900/60 text-rose-300 border border-rose-800'
-                        : 'bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-800'
-                    }`}
-                  >
-                    {rel.is_approved ? 'Revoke Approval' : 'Approve for FOTA'}
-                  </button>
-                )}
+                <div className="flex items-center gap-2">
+                  {hasRole('operator') && (
+                    <button
+                      onClick={() => handleDeleteRelease(rel.id, rel.version)}
+                      className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-950/40 hover:bg-rose-900/60 text-rose-400 border border-rose-800/60 transition-colors flex items-center gap-1"
+                      title="Delete this firmware release"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete</span>
+                    </button>
+                  )}
+
+                  {hasRole('admin') && (
+                    <button
+                      onClick={() => handleToggleApproval(rel.id, rel.is_approved)}
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
+                        rel.is_approved
+                          ? 'bg-amber-950/60 hover:bg-amber-900/60 text-amber-300 border border-amber-800'
+                          : 'bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-800'
+                      }`}
+                    >
+                      {rel.is_approved ? 'Revoke Approval' : 'Approve for FOTA'}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))

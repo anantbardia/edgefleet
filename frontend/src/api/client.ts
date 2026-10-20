@@ -168,6 +168,10 @@ class ApiClient {
         method: 'PATCH',
         body: JSON.stringify({ is_approved }),
       }),
+    delete: (releaseId: string) =>
+      this.request<void>(`/firmware/${releaseId}`, {
+        method: 'DELETE',
+      }),
   };
 
   // ── Deployments ───────────────────────────────────────────────────────────
