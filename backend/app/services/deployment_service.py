@@ -239,8 +239,9 @@ class DeploymentService:
             try:
                 async with async_session_factory() as db:
                     # Check if there is already an active (non-terminal, non-queued) job
+                    non_active = list(TERMINAL_STATES) + ["queued", "QUEUED", "success", "failed", "cancelled", "recovery_required"]
                     active_stmt = select(DeploymentJob).where(
-                        DeploymentJob.state.not_in(TERMINAL_STATES + ["QUEUED"])
+                        DeploymentJob.state.not_in(non_active)
                     )
                     active_res = await db.execute(active_stmt)
                     active_job = active_res.scalar_one_or_none()
@@ -249,7 +250,7 @@ class DeploymentService:
                         # Pick next queued job (FIFO)
                         next_stmt = (
                             select(DeploymentJob)
-                            .where(DeploymentJob.state == "QUEUED")
+                            .where(DeploymentJob.state.in_(["queued", "QUEUED"]))
                             .order_by(DeploymentJob.started_at.asc().nullsfirst(), DeploymentJob.id.asc())
                             .limit(1)
                         )

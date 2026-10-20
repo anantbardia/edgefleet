@@ -3,6 +3,7 @@
 import asyncio
 import json
 import logging
+import os
 from typing import Any, Dict, Optional
 
 import paho.mqtt.client as mqtt
@@ -33,14 +34,15 @@ class MQTTClient:
         """Initialize and start the MQTT client in a background network loop."""
         self._loop = loop
 
-        # Callback API v2 compatibility
+        # Callback API v2 compatibility with unique process client ID
+        client_id = f"{settings.MQTT_CLIENT_ID}-{os.getpid()}"
         try:
             self.client = mqtt.Client(
                 callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
-                client_id=settings.MQTT_CLIENT_ID,
+                client_id=client_id,
             )
         except AttributeError:
-            self.client = mqtt.Client(client_id=settings.MQTT_CLIENT_ID)
+            self.client = mqtt.Client(client_id=client_id)
 
         if settings.MQTT_USERNAME and settings.MQTT_PASSWORD:
             self.client.username_pw_set(settings.MQTT_USERNAME, settings.MQTT_PASSWORD)
