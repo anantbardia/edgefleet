@@ -1,213 +1,210 @@
 # EdgeFleet: Presentation Slide Deck (8 Core Slides)
-### *A Practical, High-Impact Guide to Impress Your Faculty*
-
-> **Presentation Strategy for Faculty**:
-> Faculty members care about three key things:
-> 1. **Did you solve a real, practical engineering problem?** (Yes: remote firmware updates without bricking devices).
-> 2. **Is your architecture well-structured and sound?** (Yes: 3-tier edge-native architecture).
-> 3. **Did you build and test a real working prototype?** (Yes: Raspberry Pi Gateway + ESP32-C3 Mini Wi-Fi node + Arduino Uno).
->
-> Keep slides clean with bold headings and minimal text. Use the provided **"What to Say"** speaker notes to sound confident and professional.
 
 ---
 
-## Slide 1: The Real-World Problem — The IoT Maintenance Dilemma
+## Slide 1: The Problem — The IoT Maintenance & Update Challenge
 
-### Slide Heading
-**The Challenge: Managing & Updating Remote IoT Microcontrollers**
+### Slide Title
+**The Challenge: Managing & Updating Distributed IoT Microcontrollers**
 
-### Bullet Points on Slide
-- **Inaccessible Devices**: IoT nodes are deployed in remote locations (factory ceilings, agricultural fields, smart streetlights) where manual physical access is expensive or impossible.
-- **The "Bricking" Nightmare**: If power cuts out or a corrupted binary is sent during a remote update, the microcontroller is permanently disabled ("bricked") and requires manual replacement.
-- **Heterogeneous Hardware**: Real-world deployments mix different chips together—modern 32-bit Wi-Fi microcontrollers (**ESP32-C3**) alongside rugged 8-bit industrial controllers (**Arduino Uno**).
-- **Cloud Dependency Risks**: Relying entirely on external cloud servers creates high latency, recurring subscription costs, and total failure when the local internet goes down.
+### Key Takeaway
+Remote microcontrollers are hard to reach, risky to update, and vulnerable to catastrophic failure ("bricking").
 
-### Visual on Slide
-- Visual contrast: A technician climbing a tall ladder in a factory with a laptop cable vs. a wireless update signal.
-- Tagline: *"How do we update hundreds of different microcontrollers remotely without ever bricking them?"*
+### Slide Content (Bullet Points)
+- **Physically Inaccessible Hardware**: IoT nodes are installed in remote, hazardous, or elevated locations (factory machinery, agricultural fields, utility poles) where physical maintenance is costly and impractical.
+- **The "Bricking" Risk**: A dropped network packet, power cut, or corrupted binary during a firmware flash can leave a microcontroller permanently disabled, requiring on-site replacement.
+- **Heterogeneous Environments**: Fleets consist of mixed hardware—modern 32-bit Wi-Fi microcontrollers (**ESP32-C3 Mini**) alongside rugged 8-bit industrial controllers (**Arduino Uno**).
+- **Single-Point Cloud Vulnerability**: Cloud-only IoT platforms (Blynk, ThingSpeak, AWS IoT) require constant internet, incur recurring subscription costs, and fail when local network connectivity drops.
 
-### What to Say to Faculty
-> *"Respected faculty, in modern IoT, deploying sensors is only the first step. The hardest problem is maintaining them. Once you mount a sensor on a farm pole or inside an industrial machine, you cannot go with a USB cable every time there is a bug fix or feature update. If an update fails halfway through, the device is dead. EdgeFleet solves this by giving you a secure, local command center that manages and updates heterogeneous microcontrollers completely over-the-air, with zero risk of bricking."*
+### Visual Recommendation
+- Contrast graphic: An engineer with a ladder and laptop cable vs. a central dashboard sending a wireless update signal.
 
 ---
 
-## Slide 2: The Solution — EdgeFleet Overview
+## Slide 2: The Solution — EdgeFleet Platform Overview
 
-### Slide Heading
+### Slide Title
 **EdgeFleet: Edge-Native Fleet Management & Safe FOTA Platform**
 
-### Bullet Points on Slide
-- **Centralized Edge Gateway**: A Raspberry Pi acts as a local on-site brain, managing devices independently even if the wider internet is down.
-- **Unified Multi-Board Support**: Manages both wireless **ESP32-C3 Mini** nodes over Wi-Fi and wired **Arduino Uno** nodes over USB serial from a single dashboard.
-- **Fail-Safe Firmware Over-The-Air (FOTA)**: Safe remote updates that automatically roll back if something goes wrong.
-- **Real-Time Fleet Dashboard**: A responsive web control panel for real-time sensor monitoring, device health tracking, and 1-click deployments.
+### Key Takeaway
+A local edge gateway that unifies heterogeneous microcontrollers with safe remote updates and real-time observability.
 
-### Visual on Slide
-- A clean diagram showing the **Raspberry Pi Gateway** in the middle, wirelessly controlling **ESP32-C3** nodes and wired **Arduino Uno** nodes, with a laptop/mobile accessing the dashboard.
+### Slide Content (Bullet Points)
+- **Autonomous Local Gateway**: Powered by a Raspberry Pi 4 operating on-premise, allowing full fleet management even without public internet connectivity.
+- **Multi-Architecture Support**: Centrally manages both wireless **ESP32-C3 Mini** nodes (via Wi-Fi) and wired **Arduino Uno** nodes (via USB serial).
+- **Fail-Safe Firmware Over-The-Air (FOTA)**: Atomic updates with preflight hardware checks and automatic rollback protection.
+- **Real-Time Web Dashboard**: A single browser-based interface for telemetry monitoring, device health tracking, and 1-click deployments.
 
-### What to Say to Faculty
-> *"EdgeFleet is an edge-native IoT management platform. Instead of forcing every tiny microcontroller to talk directly to an expensive cloud server, we place an intelligent gateway—a Raspberry Pi—on the local premises. The gateway talks to modern Wi-Fi devices like the ESP32-C3 Mini and legacy wired devices like Arduino Uno. It provides a real-time web dashboard where an engineer can monitor live telemetry and push new firmware with a single click."*
+### Visual Recommendation
+- Diagram showing the **Raspberry Pi Gateway** in the center communicating with **ESP32-C3** nodes over Wi-Fi and **Arduino Uno** nodes over USB, with a browser interface connected to the gateway.
 
 ---
 
-## Slide 3: System Architecture — The 3-Tier Hierarchy
+## Slide 3: System Architecture — 3-Tier Edge-Native Design
 
-### Slide Heading
-**System Architecture: Clean 3-Tier Design**
+### Slide Title
+**System Architecture: 3-Tier Layered Hierarchy**
 
-### Bullet Points on Slide
+### Key Takeaway
+Clean separation between operator presentation, edge gateway orchestration, and physical microcontroller execution.
+
+### Slide Content (Bullet Points)
 - **Tier 1: Operator Presentation Layer (Frontend)**
-  - Modern web dashboard built with **React** and **TypeScript**.
-  - Uses **WebSockets** for live, instant updates without refreshing the page.
+  - Web dashboard built with **React 18** and **TypeScript**.
+  - Bidirectional **WebSockets** for sub-second telemetry and live deployment tracking.
 - **Tier 2: Edge Gateway Controller (Raspberry Pi 4)**
-  - **FastAPI Core**: High-speed asynchronous engine managing devices and firmware binaries.
-  - **Mosquitto MQTT Broker**: Ultra-lightweight messaging engine for sensor data and commands.
-  - **Local SQLite Database**: Stores device logs, release files, and telemetry locally.
-- **Tier 3: Distributed Edge Nodes (Physical Hardware)**
-  - **ESP32-C3 Mini**: High-speed 32-bit RISC-V microcontroller with Wi-Fi and dual-partition OTA.
-  - **Arduino Uno**: 8-bit AVR microcontroller connected via USB serial for rugged sensing.
+  - **FastAPI Engine**: Asynchronous core handling API requests, RBAC security, and deployment pipelines.
+  - **Mosquitto MQTT Broker**: Lightweight pub/sub messaging engine for high-frequency telemetry.
+  - **Local SQLite Database (WAL Mode)**: High-speed concurrent local storage for fleet logs and firmware releases.
+- **Tier 3: Distributed Edge Hardware (Physical Nodes)**
+  - **ESP32-C3 Mini**: 32-bit RISC-V core with Wi-Fi, dual-partition A/B flash, and onboard status LEDs.
+  - **Arduino Uno**: 8-bit AVR ATmega328P connected via USB serial for rugged sensing.
 
-### Visual on Slide
-- 3 clean horizontal layers:
-  - `Top`: Operator Web Dashboard (React)
-  - `Middle`: Raspberry Pi 4 Gateway (FastAPI + MQTT + SQLite)
-  - `Bottom`: Physical Hardware Nodes (ESP32-C3 Mini + Arduino Uno)
-
-### What to Say to Faculty
-> *"Our architecture follows a clean 3-tier hierarchy. At Tier 1, operators have a responsive React dashboard with live WebSockets. At Tier 2, our Raspberry Pi edge gateway runs an asynchronous FastAPI server, an MQTT broker, and a local database. At Tier 3, we have the physical hardware: an ESP32-C3 Mini communicating wirelessly and an Arduino Uno communicating over serial. This structure keeps the heavy processing on the gateway, allowing our microcontrollers to stay lightweight and power-efficient."*
+### Visual Recommendation
+- 3 horizontal layer blocks:
+  - Top Block: `Web Dashboard (React + WebSockets)`
+  - Middle Block: `Raspberry Pi 4 Gateway (FastAPI + Mosquitto + SQLite)`
+  - Bottom Block: `Edge Nodes (ESP32-C3 Mini [Wi-Fi] + Arduino Uno [USB])`
 
 ---
 
 ## Slide 4: System Architecture Flow — How Data & Updates Move
 
-### Slide Heading
-**Data & Command Flow: Step-by-Step Architecture Pipeline**
+### Slide Title
+**System Architecture Flow: Data Ingestion & FOTA Execution Pipeline**
 
-### Visual Diagram for Slide
-*(You can draw this exact flow in PowerPoint or Draw.io)*
+### Key Takeaway
+Optimized dual-channel communication: lightweight MQTT for commands and telemetry; high-throughput HTTP for firmware streaming.
 
+### Slide Content (Bullet Points)
+1. **Telemetry Pipeline**: Microcontrollers publish sensor metrics to MQTT broker every 5s ➔ Gateway broadcasts to Dashboard via WebSockets.
+2. **Preflight Safety Gate**: Gateway validates firmware target compatibility before dispatch (prevents flashing Arduino code onto an ESP32).
+3. **Command Dispatch**: Gateway dispatches an update trigger command containing SHA-256 hash and download URL via MQTT.
+4. **Local HTTP Binary Stream**: ESP32-C3 downloads the 1.1 MB binary directly from the local gateway IP (`10.202.94.199`) in under 4 seconds.
+5. **Flash & Self-Test**: ESP32 verifies checksum, reboots into the new firmware, and reports online status.
+
+### Flow Diagram for Slide
 ```
 [ Operator Dashboard ]
-         │
          │  1. Initiate Deployment (HTTPS/WSS)
          ▼
-[ Raspberry Pi Gateway ]
-   ├── 2. Runs Preflight Safety Check (Validates board & firmware)
+[ Raspberry Pi 4 Gateway ]
+   ├── 2. Preflight Safety Check (Validates board & binary)
    ├── 3. Sends Trigger Command via MQTT (Port 1883)
    │               │
    │               ▼
    │      [ ESP32-C3 Mini Node ]
    │               │
-   └── 4. Streams 1.1 MB Binary via local HTTP (10.202.94.199)
+   └── 4. Streams 1.1 MB Binary via local HTTP (Port 80)
                    │
                    ▼
           [ ESP32-C3 Mini Node ]
           5. Writes to Inactive Partition
           6. Verifies SHA-256 Checksum
-          7. Reboots into New Version & Confirms Online!
+          7. Reboots into New Version & Confirms Online
 ```
-
-### Key Highlights for Faculty
-- **Two Separate Channels for Efficiency**:
-  - **MQTT**: Used for tiny, lightweight messages (sensor readings, status heartbeats, commands).
-  - **Local HTTP**: Used for fast, reliable binary file downloads (streams 1.1 MB in under 4 seconds).
-- **Continuous Feedback**: Every step is reported back to the dashboard in real time over WebSockets.
-
-### What to Say to Faculty
-> *"This flow diagram highlights the engineering elegance of our system. Notice we don't clog our MQTT broker with large firmware files. When an operator triggers an update, the gateway sends a tiny command over MQTT. The ESP32-C3 then opens a high-speed local HTTP connection to the gateway to stream the binary. Once downloaded and checksum-verified, the device reboots into the new firmware and reports success back to the dashboard. The entire process takes less than 5 seconds."*
 
 ---
 
-## Slide 5: The Hero Feature — How EdgeFleet Prevents "Bricking"
+## Slide 5: Safety Innovation — How EdgeFleet Prevents "Bricking"
 
-### Slide Heading
-**Atomic Dual-Partition (A/B) Updates: Zero-Downtime & Fail-Safe**
+### Slide Title
+**Fail-Safe Firmware Updates: Dual-Partition (A/B) Architecture**
 
-### Bullet Points on Slide
+### Key Takeaway
+Zero risk of bricking: the active firmware is never overwritten until the new version is completely downloaded and verified.
+
+### Slide Content (Bullet Points)
 - **Preflight Compatibility Gate**:
-  - Before sending an update, the gateway verifies that the firmware was compiled for the exact target board (prevents flashing Arduino code onto an ESP32).
-- **Dual A/B Flash Partitioning**:
-  - Flash memory is divided into two separate application slots: **Slot A** and **Slot B**.
-  - While the node is running safely on **Slot A**, the new update downloads into **Slot B**.
-- **Cryptographic Verification**:
-  - The node computes the **SHA-256 checksum** of the downloaded code before switching.
-- **Automatic Fallback Watchdog**:
-  - If power cuts out during download: **Slot A is completely untouched**.
-  - If the new code crashes on boot: The hardware bootloader automatically reverts to **Slot A**.
+  - Automatically matches MCU family and board variant before deployment dispatch.
+- **Dual A/B Partition Layout**:
+  - Memory is split into two independent slots: **Slot A** and **Slot B**.
+  - While the device runs safely on **Slot A**, the new update streams into inactive **Slot B**.
+- **Cryptographic SHA-256 Verification**:
+  - The device computes the hash of the downloaded image; if corrupted, the partition is rejected before reboot.
+- **Hardware Watchdog & Automatic Rollback**:
+  - If a power interruption occurs during download: **Slot A remains 100% intact**.
+  - If the new firmware crashes or fails to connect: The bootloader automatically rolls back to **Slot A**.
 
-### Visual on Slide
-- Simple graphic comparing **Old Way (Single Flash)** vs. **EdgeFleet A/B Way**:
-  - *Old Way*: Overwrite active memory ➔ Power loss = Bricked board ❌
-  - *EdgeFleet*: Write to Slot B ➔ Verify ➔ Switch active boot pointer ➔ Never Bricks ✅
-
-### What to Say to Faculty
-> *"Faculty often ask: 'What happens if the Wi-Fi drops or someone pulls the plug while updating?' This slide answers that. We use an A/B dual-partition scheme. The active code is running in Partition A. The new code is written to Partition B in the background. If power is cut at 50%, Partition A is completely intact; the device restarts normally. If the new code has a fatal bug and crashes, the hardware watchdog catches it and flips back to Partition A. It is virtually impossible to brick the device."*
+### Visual Recommendation
+- Side-by-side comparison diagram:
+  - *Standard Flashing*: In-place overwrite ➔ Network drop ➔ Device dead ❌
+  - *EdgeFleet A/B*: Background write to Slot B ➔ Verify ➔ Safe Switch / Auto Rollback ✅
 
 ---
 
 ## Slide 6: Real-World Applications
 
-### Slide Heading
-**Industry Use Cases: Where EdgeFleet Delivers Real Value**
+### Slide Title
+**Real-World Applications: Domain-Specific Deployments**
 
-### 4 Key Application Quadrants
-1. **Industrial IoT (IIoT) & Smart Factories**:
-   - Machinery vibration, motor RPM, and temperature monitoring.
-   - Update threshold detection algorithms on 50+ factory machines simultaneously without halting assembly lines.
+### Key Takeaway
+EdgeFleet provides centralized lifecycle management across diverse industrial and municipal environments.
+
+### Slide Content (4 Key Application Quadrants)
+1. **Industrial IoT (IIoT) & Factory Automation**:
+   - Machinery vibration, motor RPM, and thermal monitoring.
+   - Update anomaly detection thresholds across 50+ machines simultaneously without halting assembly lines.
 2. **Smart Agriculture & Precision Farming**:
-   - Soil moisture, nutrient, and micro-climate sensors scattered across acres.
-   - Farmhouse gateway updates irrigation schedules and power-saving sleep routines wirelessly.
-3. **Smart Cities & Municipal Infrastructure**:
-   - Connected streetlights, smart parking nodes, and automated water flow meters.
-   - Updates dispatched across entire city blocks without requiring physical maintenance trucks.
+   - Soil moisture, nutrient, and environmental sensors across acres of land.
+   - Central farmhouse gateway updates irrigation schedules and sleep algorithms wirelessly.
+3. **Smart Cities & Infrastructure**:
+   - Connected streetlights, automated water metering, and parking vacancy sensors.
+   - Push security patches across city blocks without sending maintenance trucks.
 4. **Hazardous Environmental Monitoring**:
-   - Flood level, air quality, and wildfire detection nodes placed in dangerous or inaccessible areas.
-   - Wired Arduino sensor units updated over serial safely from the gateway.
+   - Flood detection, wildfire monitoring, and air quality nodes in dangerous or remote terrain.
+   - Updates dispatched safely from a distance with zero physical contact required.
 
-### What to Say to Faculty
-> *"EdgeFleet isn't just a classroom project; it directly addresses major industrial needs. In precision agriculture, farmers have sensor nodes spread across acres—EdgeFleet updates all of them from a gateway on the barn. In smart factories, changing sensor logic on 50 machines takes seconds instead of taking days of downtime. Any sector deploying distributed microcontrollers benefits from centralized, safe fleet management."*
+### Visual Recommendation
+- 4-quadrant layout with clean icons: Factory Gear (IIoT), Crop Sprout (Agriculture), City Skyline (Smart Cities), Weather/Shield (Environment).
 
 ---
 
-## Slide 7: Technical Stack & Working Implementation
+## Slide 7: Technical Stack & Practical Implementation
 
-### Slide Heading
-**Engineering Stack: Production-Grade Technologies**
+### Slide Title
+**Technical Stack & Engineering Highlights**
 
-### Technology Breakdown Table
-| Layer | Technologies Used | Role in EdgeFleet |
+### Key Takeaway
+Production-grade open-source technologies integrated into a lightweight, cost-effective edge system.
+
+### Slide Content (Component Table)
+| Layer | Technologies Used | Role in System |
 | :--- | :--- | :--- |
-| **Operator UI** | React 18, TypeScript, Vite, WebSockets | Instant real-time control & telemetry visualization |
-| **Gateway Brain** | Python 3.11, FastAPI, SQLite (WAL Mode) | Asynchronous business logic & local data persistence |
-| **Communications** | Mosquitto MQTT (Port 1883), HTTP/1.1 | Telemetry streaming & high-speed binary delivery |
-| **Security** | JWT Tokens, bcrypt, Cloudflare Zero Trust | Secure role-based login & encrypted global access |
+| **Frontend** | React 18, TypeScript, Vite, WebSockets | Real-time control dashboard & telemetry visualization |
+| **Gateway Core** | Python 3.11, FastAPI, SQLite (WAL Mode) | Asynchronous device orchestration & local database |
+| **Messaging** | Mosquitto MQTT v2.0 (Port 1883), HTTP/1.1 | Telemetry pub/sub & high-speed binary delivery |
+| **Security** | JWT Tokens, bcrypt, Cloudflare Zero Trust | Secure role-based login & encrypted remote ingress |
 | **Edge Hardware** | ESP32-C3 Mini (RISC-V) & Arduino Uno (AVR) | Wi-Fi sensing node & USB serial sensor node |
 
-### Key Practical Achievements
-- **Zero Cloud Costs**: Runs entirely on a standard Raspberry Pi 4 (consumes <350 MB RAM).
-- **Public Remote Access**: Reachable securely from anywhere in the world via Cloudflare Tunnel without opening router ports.
-- **Tested on Physical Hardware**: Real ESP32-C3 Mini connected, streaming telemetry, and accepting OTA updates.
-
-### What to Say to Faculty
-> *"Our implementation uses proven, production-grade tools. We chose FastAPI for its high asynchronous speed, Mosquitto MQTT for lightweight device messaging, and React for a modern, responsive interface. The entire gateway runs efficiently on a 2GB Raspberry Pi with under 350 megabytes of memory. Through an encrypted Cloudflare Tunnel, we can demonstrate controlling the hardware right from our smartphones without port-forwarding."*
+### Key Practical Highlights
+- **Ultra-Low Resource Footprint**: Entire gateway runs on a 2 GB Raspberry Pi 4 using under 350 MB RAM.
+- **Zero Cloud Costs**: Operates independently on local network; optional public access via free Cloudflare Tunnel without port-forwarding.
+- **Real Working Prototype**: Live physical demonstration with active telemetry streaming and over-the-air updates.
 
 ---
 
-## Slide 8: Current Capabilities & Future Roadmap
+## Slide 8: Validated Results & Future Scope
 
-### Slide Heading
-**Validated Results & Future Vision**
+### Slide Title
+**Current Capabilities & Future Engineering Scope**
 
-### Validated Results (What Works Today)
-- ✅ **Tested Wi-Fi OTA**: ESP32-C3 Mini downloads and flashes 1.1 MB firmware in under **4.5 seconds**.
-- ✅ **Tested Serial Flashing**: Arduino Uno programmed over USB via `avrdude` STK500 protocol.
-- ✅ **Real-Time Telemetry**: Live sensor metrics pushed every 5 seconds with automatic offline detection.
-- ✅ **Safety Validated**: Preflight checks prevent wrong-architecture firmware flashing.
+### Key Takeaway
+A fully functional, benchmarked working prototype ready for real-world deployment and future enhancements.
 
-### Future Scope (Where We Can Take It Next)
-- **1. Cryptographic Signature Verification**: Using hardware eFuses and Ed25519 digital signatures so only authorized code can run on the chip.
-- **2. Mesh Network Updates (ESP-NOW)**: Allowing ESP32 nodes to relay firmware to neighboring nodes that are out of Wi-Fi range.
-- **3. Low-Bandwidth Delta Updates**: Sending only binary differences (diffs) to reduce update size from 1.1 MB down to 50 KB for cellular/solar nodes.
+### Slide Content (Two Columns)
 
-### What to Say to Faculty
-> *"To conclude, EdgeFleet is a complete, working prototype. We have verified both Wi-Fi OTA on the ESP32-C3 Mini in under 4.5 seconds and USB serial flashing on the Arduino Uno. Looking ahead, we plan to implement cryptographic hardware signing and ESP-NOW mesh networking so nodes can daisy-chain updates to devices far outside Wi-Fi coverage. Thank you, and we welcome any questions from the panel!"*
+#### Column 1: Validated Results (Working Today)
+- **Fast Wi-Fi FOTA**: ESP32-C3 Mini downloads and flashes 1.1 MB firmware in under **4.5 seconds**.
+- **Serial Programming**: Arduino Uno flashed over USB serial via automated `avrdude` STK500 pipeline.
+- **Live Telemetry & Alerts**: Sensor telemetry streaming every 5 seconds with automatic offline detection.
+- **Safety Verified**: Preflight gate blocks mismatched binaries; A/B rollback protects against failed boots.
+
+#### Column 2: Future Scope (Roadmap)
+- **Hardware-Enforced Cryptographic Signing**: Embedding Ed25519 public keys in hardware eFuses to prevent unauthorized firmware execution.
+- **Peer-to-Peer Mesh Updates (ESP-NOW)**: Allowing Wi-Fi nodes to daisy-chain firmware to nodes located outside router range.
+- **Binary Delta Updates**: Generating binary diffs to reduce update transfer sizes from 1.1 MB to ~50 KB for cellular IoT.
+
+### Visual Recommendation
+- Left side: Green checkmark badges for current working achievements.
+- Right side: Forward-arrow milestone cards for future enhancements.
