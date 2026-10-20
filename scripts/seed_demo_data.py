@@ -171,7 +171,7 @@ async def seed_data():
             id=str(uuid.uuid4()),
             version="2.0.0",
             mcu_family="esp32",
-            target_boards=["esp32-wroom-32", "esp32-s3-wroom-1", "esp32-c3-devkitm-1"],
+            target_boards=["esp32-wroom-32", "esp32-c3-super-mini", "esp32-c3-devkitm-1"],
             file_path=p2,
             file_size=sz2,
             sha256=h2,

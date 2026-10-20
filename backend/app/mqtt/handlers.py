@@ -80,8 +80,8 @@ async def handle_status(device_id: str, payload: Dict[str, Any]):
 
         async with async_session_factory() as db:
             target_ids = [device_id]
-            if device_id in ("esp32-s3-01", "esp32-c3-01"):
-                target_ids = ["esp32-c3-01", "esp32-s3-01"]
+            if device_id in ("esp32-s3-01", "esp32-c3-01", "esp32-c3-mini"):
+                target_ids = ["esp32-c3-mini", "esp32-c3-01", "esp32-s3-01"]
             res = await db.execute(select(Device).where(Device.device_id.in_(target_ids)))
             dev = res.scalar_one_or_none()
             if not dev:
@@ -99,7 +99,10 @@ async def handle_status(device_id: str, payload: Dict[str, Any]):
             if fw_ver:
                 update_fields["firmware_version"] = str(fw_ver)
             if board_var:
-                update_fields["board_variant"] = str(board_var)
+                bv = str(board_var)
+                if "S3" in bv.upper():
+                    bv = "ESP32-C3"
+                update_fields["board_variant"] = bv
 
             await db.execute(
                 update(Device).where(Device.id == dev.id).values(**update_fields)

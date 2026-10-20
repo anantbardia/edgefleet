@@ -25,7 +25,7 @@ const char* GATEWAY_HOST      = "10.202.94.199";
 const int   MQTT_PORT         = 1883;
 
 // Device Identity
-const char* DEVICE_ID         = "esp32-c3-01"; // Registered device identifier
+const char* DEVICE_ID         = "esp32-c3-mini"; // ESP32-C3 Mini registered identifier
 const char* BOARD_VARIANT     = "ESP32-C3";
 const char* CURRENT_VERSION   = "1.1.0"; // Version 1.1.0: Active Wi-Fi Blink
 
@@ -228,8 +228,9 @@ void connectMQTT() {
   if (mqttClient.connect(DEVICE_ID, topicStatus.c_str(), 1, true, lwtPayload)) {
     Serial.println("[MQTT] Connected successfully!");
 
-    // Subscribe to commands topic (both primary and legacy alias)
+    // Subscribe to commands topic (both primary and fallback aliases)
     mqttClient.subscribe(topicCommands.c_str(), 1);
+    mqttClient.subscribe("edgefleet/v1/devices/esp32-c3-01/commands", 1);
     mqttClient.subscribe("edgefleet/v1/devices/esp32-s3-01/commands", 1);
     Serial.printf("[MQTT] Subscribed to %s\n", topicCommands.c_str());
 

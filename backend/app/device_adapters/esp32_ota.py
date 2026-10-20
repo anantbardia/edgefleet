@@ -99,10 +99,9 @@ class ESP32OTAAdapter(BaseDeviceAdapter):
             # Publish command via MQTT client (also publish to alias if transitioning s3 <-> c3)
             from app.mqtt.client import mqtt_client
             mqtt_client.publish_command(device.device_id, command_payload)
-            if device.device_id == "esp32-c3-01":
-                mqtt_client.publish_command("esp32-s3-01", command_payload)
-            elif device.device_id == "esp32-s3-01":
-                mqtt_client.publish_command("esp32-c3-01", command_payload)
+            for alias in ("esp32-c3-mini", "esp32-c3-01", "esp32-s3-01"):
+                if alias != device.device_id:
+                    mqtt_client.publish_command(alias, command_payload)
 
             # In mock mode or if no real node responds within 3 seconds, simulate progression
             simulated = settings.MOCK_MODE or not device.is_online
