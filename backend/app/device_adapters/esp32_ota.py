@@ -44,7 +44,7 @@ class ESP32OTAAdapter(BaseDeviceAdapter):
             warnings.append(f"Device {device.device_id} is currently offline. OTA deployment will fail if device does not reconnect.")
 
         if release.target_boards and device.board_variant:
-            if device.board_variant not in release.target_boards:
+            if not self.is_board_compatible(device.board_variant, release.target_boards):
                 warnings.append(
                     f"Board variant '{device.board_variant}' not in release target boards: {release.target_boards}"
                 )

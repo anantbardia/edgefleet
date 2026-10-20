@@ -79,7 +79,7 @@ export const FirmwareReleases: React.FC = () => {
     formData.append('version', version);
     formData.append('mcu_family', mcuFamily);
     const boardsArray = targetBoards.split(',').map((b) => b.trim()).filter(Boolean);
-    formData.append('target_boards', JSON.stringify(boardsArray));
+    formData.append('target_boards', boardsArray.join(', '));
     formData.append('release_notes', releaseNotes);
 
     try {
@@ -276,7 +276,7 @@ export const FirmwareReleases: React.FC = () => {
                     value={mcuFamily}
                     onChange={(e) => {
                       setMcuFamily(e.target.value);
-                      if (e.target.value === 'arduino_uno') setTargetBoards('atmega328p, uno');
+                      if (e.target.value === 'arduino_uno') setTargetBoards('ATmega328P, uno');
                       else setTargetBoards('esp32-wroom-32, esp32-s3-wroom-1');
                     }}
                     className="w-full bg-[#070b14] border border-fleet-border rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500"

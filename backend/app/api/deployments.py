@@ -41,6 +41,7 @@ from app.schemas.deployment import (
 )
 from app.config import settings
 from app.core.security import create_access_token
+from app.device_adapters.base import is_board_compatible
 
 router = APIRouter(prefix="/deployments", tags=["Deployments"])
 
@@ -89,7 +90,7 @@ async def preflight_check(
 
         # Board variant check
         if release.target_boards and device.board_variant:
-            if device.board_variant not in release.target_boards:
+            if not is_board_compatible(device.board_variant, release.target_boards):
                 errors.append(
                     f"Board variant '{device.board_variant}' not in target boards: "
                     f"{release.target_boards}"

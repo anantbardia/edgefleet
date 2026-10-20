@@ -1,6 +1,7 @@
 """Firmware management API endpoints."""
 
 import hashlib
+import json
 import uuid
 from math import ceil
 from pathlib import Path
@@ -147,8 +148,31 @@ async def upload_firmware(
             f"Firmware with SHA-256 {sha256[:16]}... already exists"
         )
 
-    # Parse target boards
-    boards = [b.strip() for b in target_boards.split(",") if b.strip()]
+    # Parse target boards (support JSON array string, comma-separated string, or nested brackets)
+    raw_tb = target_boards.strip()
+    boards = []
+    if raw_tb.startswith("[") and raw_tb.endswith("]"):
+        try:
+            parsed = json.loads(raw_tb)
+            if isinstance(parsed, list):
+                for item in parsed:
+                    if isinstance(item, str):
+                        for part in item.strip(" []\"'").split(","):
+                            p = part.strip(" []\"'")
+                            if p:
+                                boards.append(p)
+                    elif item:
+                        boards.append(str(item).strip())
+        except Exception:
+            pass
+
+    if not boards:
+        for part in raw_tb.replace("[", "").replace("]", "").split(","):
+            p = part.strip(" []\"'")
+            if p:
+                boards.append(p)
+
+    boards = list(dict.fromkeys(boards))
     if not boards:
         raise FirmwareValidationError("At least one target board is required")
 
