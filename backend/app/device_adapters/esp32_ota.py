@@ -69,7 +69,19 @@ class ESP32OTAAdapter(BaseDeviceAdapter):
             # Build OTA command payload with full download URL
             gateway_base = getattr(settings, "GATEWAY_BASE_URL", "").rstrip("/")
             if not gateway_base:
-                host = settings.MQTT_HOST if (settings.MQTT_HOST and settings.MQTT_HOST not in ("localhost", "127.0.0.1")) else "192.168.137.99"
+                host = None
+                if settings.MQTT_HOST and settings.MQTT_HOST not in ("localhost", "127.0.0.1", "0.0.0.0"):
+                    host = settings.MQTT_HOST
+                elif getattr(settings, "GATEWAY_HOST", ""):
+                    host = settings.GATEWAY_HOST
+                else:
+                    try:
+                        import socket
+                        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+                            s.connect(("8.8.8.8", 80))
+                            host = s.getsockname()[0]
+                    except Exception:
+                        host = "10.202.94.199"
                 gateway_base = f"http://{host}"
             firmware_url = f"{gateway_base}/api/firmware/{release.id}/download"
 
