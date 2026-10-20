@@ -142,7 +142,13 @@ export const DeploymentManager: React.FC = () => {
     const stepIdx = DEPLOYMENT_STEPS.indexOf(stepName);
     const currIdx = DEPLOYMENT_STEPS.indexOf(currentState);
 
-    if (currentState === 'failed' || currentState === 'cancelled') return 'error';
+    if (currentState === 'failed' || currentState === 'cancelled') {
+      const stage = activeJob?.progress_details?.stage;
+      const failedIdx = stage ? DEPLOYMENT_STEPS.indexOf(stage) : 1;
+      if (stepIdx === Math.max(0, failedIdx)) return 'error';
+      if (stepIdx < failedIdx) return 'completed';
+      return 'pending';
+    }
     if (stepIdx < currIdx || currentState === 'success') return 'completed';
     if (stepIdx === currIdx) return 'active';
     return 'pending';
@@ -176,8 +182,15 @@ export const DeploymentManager: React.FC = () => {
         <div className="glass-panel p-6 rounded-2xl border border-cyan-800/80 shadow-glow-cyan">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
-              <div className="text-xs font-mono text-cyan-400 font-bold uppercase tracking-wider mb-1">
-                Active Job in Progress: {activeJob.id.slice(0, 8)}...
+              <div className={`text-xs font-mono font-bold uppercase tracking-wider mb-1 flex items-center gap-2 ${
+                activeJob.state === 'failed' ? 'text-rose-400' : activeJob.state === 'success' ? 'text-emerald-400' : 'text-cyan-400'
+              }`}>
+                <span>{activeJob.state === 'failed' ? 'Job Failed' : activeJob.state === 'success' ? 'Job Completed' : 'Active Job in Progress'}: {activeJob.id.slice(0, 8)}...</span>
+                <span className={`text-[10px] px-2 py-0.5 rounded uppercase font-semibold ${
+                  activeJob.state === 'failed' ? 'bg-rose-950 text-rose-300 border border-rose-800' : activeJob.state === 'success' ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-cyan-950 text-cyan-300 border border-cyan-800'
+                }`}>
+                  {activeJob.state}
+                </span>
               </div>
               <div className="text-base font-extrabold text-white flex items-center gap-3">
                 <span>Target: {activeJob.device_id}</span>

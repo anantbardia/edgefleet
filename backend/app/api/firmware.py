@@ -233,10 +233,9 @@ async def update_release(
 @router.get("/{release_id}/download")
 async def download_firmware(
     release_id: str,
-    user: User = Depends(require_viewer),
     db: AsyncSession = Depends(get_db),
 ):
-    """Download firmware binary (authenticated)."""
+    """Download firmware binary (allows direct microcontroller OTA streaming)."""
     result = await db.execute(
         select(FirmwareRelease).where(FirmwareRelease.id == release_id)
     )
