@@ -50,6 +50,7 @@ async def cloud_sync_periodic_loop():
             if settings.CLOUD_ENABLED and settings.CLOUD_API_URL:
                 async with async_session_factory() as db:
                     await cloud_sync_service.sync_batch(db)
+                    await cloud_sync_service.pull_pending_deployments(db)
                     await cloud_sync_service.prune_old_events(db)
         except asyncio.CancelledError:
             break
@@ -124,6 +125,7 @@ def create_app() -> FastAPI:
     app.include_router(deployments.router, prefix="/api")
     app.include_router(alerts.router, prefix="/api")
     app.include_router(cloud.router, prefix="/api")
+    app.include_router(cloud.sync_router, prefix="/api")
 
     # WebSocket endpoints
     @app.websocket("/ws")

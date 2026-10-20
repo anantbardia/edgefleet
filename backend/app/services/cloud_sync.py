@@ -189,6 +189,119 @@ class CloudSyncService:
         await db.commit()
         return len(events) if success else 0
 
+    async def pull_pending_deployments(self, db: AsyncSession) -> int:
+        """Poll cloud control plane for any pending firmware deployments targeted at this gateway."""
+        if not settings.CLOUD_ENABLED or not settings.CLOUD_API_URL:
+            return 0
+
+        url = f"{settings.CLOUD_API_URL.rstrip('/')}/api/v1/sync/pending-deployments"
+        headers = {
+            "Authorization": f"Bearer {settings.CLOUD_API_KEY}",
+            "User-Agent": f"EdgeFleet-Gateway/{settings.APP_VERSION}",
+        }
+
+        try:
+            async with httpx.AsyncClient(timeout=20.0) as client:
+                resp = await client.get(url, headers=headers)
+                if resp.status_code != 200:
+                    return 0
+
+                jobs = resp.json().get("jobs", [])
+                if not jobs:
+                    return 0
+
+                for job_data in jobs:
+                    await self._process_remote_deployment(db, client, job_data)
+
+                return len(jobs)
+        except Exception as exc:
+            logger.debug("Error checking remote cloud deployments: %s", exc)
+            return 0
+
+    async def _process_remote_deployment(
+        self, db: AsyncSession, client: httpx.AsyncClient, job_data: Dict[str, Any]
+    ):
+        """Download firmware release binary, register release and device locally, and queue deployment."""
+        from app.models.deployment import DeploymentJob
+        from app.models.firmware import FirmwareRelease
+        from app.models.device import Device
+        import os
+
+        rel_data = job_data.get("release", {})
+        device_id = job_data.get("device_id")
+        remote_job_id = job_data.get("id")
+
+        if not rel_data or not device_id or not remote_job_id:
+            return
+
+        # Check if deployment job already exists locally
+        existing_job = await db.execute(select(DeploymentJob).where(DeploymentJob.id == remote_job_id))
+        if existing_job.scalar_one_or_none():
+            return
+
+        # 1. Ensure local firmware release binary exists
+        rel_id = rel_data.get("id")
+        filename = f"{rel_data.get('version')}_{rel_id[:8]}.bin"
+        local_dir = settings.firmware_storage
+        local_path = str(local_dir / filename)
+
+        if not os.path.exists(local_path):
+            # Download binary from cloud
+            download_url = f"{settings.CLOUD_API_URL.rstrip('/')}/api/firmware/{rel_id}/download"
+            headers = {"Authorization": f"Bearer {settings.CLOUD_API_KEY}"}
+            file_resp = await client.get(download_url, headers=headers)
+            if file_resp.status_code == 200:
+                with open(local_path, "wb") as f:
+                    f.write(file_resp.content)
+            else:
+                logger.warning("Failed to download cloud firmware binary %s", rel_id)
+                return
+
+        # Register FirmwareRelease locally if not present
+        existing_rel = await db.execute(select(FirmwareRelease).where(FirmwareRelease.id == rel_id))
+        if not existing_rel.scalar_one_or_none():
+            release = FirmwareRelease(
+                id=rel_id,
+                version=rel_data.get("version"),
+                mcu_family=rel_data.get("mcu_family", "esp32"),
+                target_boards=rel_data.get("target_boards", []),
+                file_path=local_path,
+                file_size=os.path.getsize(local_path),
+                sha256=rel_data.get("sha256"),
+                is_approved=True,
+                release_notes=rel_data.get("release_notes", "Synced from Cloud Control Plane"),
+            )
+            db.add(release)
+            await db.commit()
+
+        # 2. Ensure device exists locally
+        dev_res = await db.execute(select(Device).where(Device.device_id == device_id))
+        dev = dev_res.scalar_one_or_none()
+        if not dev:
+            # Auto-register device stub
+            dev = Device(
+                device_id=device_id,
+                name=job_data.get("device_name", device_id),
+                mcu_family=rel_data.get("mcu_family", "esp32"),
+                board_variant="esp32-wroom-32",
+            )
+            db.add(dev)
+            await db.commit()
+
+        # 3. Create DeploymentJob in QUEUED state
+        new_job = DeploymentJob(
+            id=remote_job_id,
+            device_id=device_id,
+            release_id=rel_id,
+            state="QUEUED",
+            target_version=rel_data.get("version"),
+            requested_by="cloud_control_plane",
+            progress_details={"source": "cloud_sync"},
+        )
+        db.add(new_job)
+        await db.commit()
+        logger.info("Queued remote cloud deployment %s for device %s", remote_job_id, device_id)
+
     async def prune_old_events(self, db: AsyncSession):
         """Prune sent or expired events older than retention period."""
         cutoff = datetime.now(timezone.utc) - timedelta(

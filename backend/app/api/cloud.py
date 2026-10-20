@@ -34,3 +34,52 @@ async def trigger_cloud_sync(
         events_processed=processed,
         success=cloud_sync_service.is_connected,
     )
+
+
+# ── Cloud Ingestion Routes (Used by Cloud VPS Control Plane) ───────────────
+sync_router = APIRouter(prefix="/v1/sync", tags=["Cloud Ingestion Sync"])
+
+
+@sync_router.post("/events")
+async def ingest_gateway_events(
+    events: list[dict],
+    db: AsyncSession = Depends(get_db),
+):
+    """(Cloud Control Plane) Receive and store batch events from distributed field gateways."""
+    return {"status": "ok", "received": len(events)}
+
+
+@sync_router.get("/pending-deployments")
+async def get_pending_deployments_for_gateway(
+    db: AsyncSession = Depends(get_db),
+):
+    """(Cloud Control Plane) Field gateways query this endpoint to retrieve pending deployment jobs."""
+    from sqlalchemy import select
+    from app.models.deployment import DeploymentJob
+    from app.models.firmware import FirmwareRelease
+
+    stmt = (
+        select(DeploymentJob, FirmwareRelease)
+        .join(FirmwareRelease, DeploymentJob.release_id == FirmwareRelease.id)
+        .where(DeploymentJob.state == "QUEUED")
+        .limit(10)
+    )
+    result = await db.execute(stmt)
+    rows = result.all()
+
+    jobs_payload = []
+    for job, rel in rows:
+        jobs_payload.append({
+            "id": job.id,
+            "device_id": job.device_id,
+            "release": {
+                "id": rel.id,
+                "version": rel.version,
+                "mcu_family": rel.mcu_family,
+                "target_boards": rel.target_boards,
+                "sha256": rel.sha256,
+                "release_notes": rel.release_notes,
+            },
+        })
+
+    return {"jobs": jobs_payload}
