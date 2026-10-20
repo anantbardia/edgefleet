@@ -98,8 +98,14 @@ cp "$SCRIPT_DIR/edgefleet-backend.service" /etc/systemd/system/
 cp "$SCRIPT_DIR/edgefleet-sync.service" /etc/systemd/system/
 
 # Deploy Mosquitto config
+mkdir -p /var/log/mosquitto /var/run/mosquitto /var/lib/mosquitto
+chown -R mosquitto:mosquitto /var/log/mosquitto /var/run/mosquitto /var/lib/mosquitto 2>/dev/null || true
 cp "$SCRIPT_DIR/mosquitto-edgefleet.conf" /etc/mosquitto/conf.d/
-systemctl restart mosquitto
+systemctl daemon-reload
+systemctl restart mosquitto || {
+    echo "Notice: mosquitto restart had a warning, reloading..."
+    systemctl reload mosquitto || true
+}
 
 # Deploy Nginx config
 cp "$SCRIPT_DIR/nginx-edgefleet.conf" /etc/nginx/sites-available/edgefleet.conf
