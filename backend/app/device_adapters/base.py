@@ -60,6 +60,9 @@ def is_board_compatible(device_board: str | None, target_boards: Any) -> bool:
         return True
 
     dev = device_board.strip().lower()
+    if not dev:
+        return True
+
     dev_variants = {
         dev,
         dev.replace("-", "_"),

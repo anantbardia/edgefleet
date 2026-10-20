@@ -71,6 +71,7 @@ async def handle_status(device_id: str, payload: Dict[str, Any]):
         uptime = payload.get("uptime_seconds")
         ip_addr = payload.get("ip_address")
         fw_ver = payload.get("firmware_version")
+        board_var = payload.get("board_variant")
         reset_reason = payload.get("reset_reason")
 
         async with async_session_factory() as db:
@@ -90,6 +91,8 @@ async def handle_status(device_id: str, payload: Dict[str, Any]):
                 update_fields["ip_address"] = str(ip_addr)
             if fw_ver:
                 update_fields["firmware_version"] = str(fw_ver)
+            if board_var:
+                update_fields["board_variant"] = str(board_var)
 
             await db.execute(
                 update(Device).where(Device.device_id == device_id).values(**update_fields)
