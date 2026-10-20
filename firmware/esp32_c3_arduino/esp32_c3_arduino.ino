@@ -27,7 +27,7 @@ const int   MQTT_PORT         = 1883;
 // Device Identity
 const char* DEVICE_ID         = "esp32-c3-mini"; // ESP32-C3 Mini registered identifier
 const char* BOARD_VARIANT     = "ESP32-C3";
-const char* CURRENT_VERSION   = "1.1.0"; // Version 1.1.0: Active Wi-Fi Blink
+const char* CURRENT_VERSION   = "1.2.0"; // Version 1.2.0: Stop Blinking (Steady OFF)
 
 // ESP32-C3 Mini onboard LED: GPIO 8 (SuperMini) or GPIO 7 (LOLIN C3 Mini)
 #define STATUS_LED_PIN        8
@@ -309,13 +309,9 @@ void loop() {
     mqttClient.loop();
   }
 
-  // Active Onboard LED Blink (Every 500ms)
-  static unsigned long lastLedBlink = 0;
-  if (millis() - lastLedBlink > 500) {
-    lastLedBlink = millis();
-    if (STATUS_LED_PIN >= 0) digitalWrite(STATUS_LED_PIN, !digitalRead(STATUS_LED_PIN));
-    if (ALT_LED_PIN >= 0)    digitalWrite(ALT_LED_PIN, !digitalRead(ALT_LED_PIN));
-  }
+  // Version 1.2.0: LED Blinking STOPPED (Steady State demo)
+  if (STATUS_LED_PIN >= 0) digitalWrite(STATUS_LED_PIN, HIGH); // Active-low: HIGH = OFF
+  if (ALT_LED_PIN >= 0)    digitalWrite(ALT_LED_PIN, HIGH);    // Active-low: HIGH = OFF
 
   // Periodic Telemetry
   if (!otaInProgress && (millis() - lastTelemetryTime > TELEMETRY_INTERVAL)) {

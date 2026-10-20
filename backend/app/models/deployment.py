@@ -31,10 +31,10 @@ TERMINAL_STATES = {"success", "failed", "cancelled", "recovery_required"}
 VALID_TRANSITIONS = {
     "queued": {"preflight", "cancelled", "failed"},
     "preflight": {"transferring", "failed", "cancelled"},
-    "transferring": {"verifying", "failed", "cancelled"},
-    "verifying": {"installing", "failed", "cancelled"},
-    "installing": {"rebooting", "failed"},  # cancel unsafe during installation
-    "rebooting": {"health_check", "failed"},
+    "transferring": {"verifying", "installing", "failed", "cancelled"},
+    "verifying": {"installing", "rebooting", "failed", "cancelled"},
+    "installing": {"rebooting", "health_check", "success", "failed"},  # cancel unsafe during installation
+    "rebooting": {"health_check", "success", "failed"},
     "health_check": {"success", "failed"},
     "failed": {"recovery_required"},
 }

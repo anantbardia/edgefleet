@@ -150,6 +150,11 @@ class ESP32OTAAdapter(BaseDeviceAdapter):
                     await on_progress(stage, detail, None)
 
                 elif stage == "SUCCESS":
+                    if current_stage == "REBOOTING":
+                        try:
+                            await on_progress("HEALTH_CHECK", {"detail": "Verifying new firmware"}, None)
+                        except Exception:
+                            pass
                     await on_progress("SUCCESS", detail, None)
                     return True
 
