@@ -25,9 +25,9 @@ else
     echo "✗ EdgeFleet Backend Service: STOPPED"
 fi
 
-# Query REST Health Endpoint
-HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8000/api/health || echo "000")
-if [[ "$HTTP_CODE" == "200" ]]; then
+# Query REST Health Endpoint (with retry for service warm-up)
+HTTP_CODE=$(curl -s --retry 4 --retry-connrefused --retry-delay 1 -o /dev/null -w "%{http_code}" http://127.0.0.1/api/health || true)
+if [[ "$HTTP_CODE" == *"200"* ]]; then
     echo "✓ API Health (/api/health): OK (HTTP 200)"
 else
     echo "✗ API Health (/api/health): FAILED (HTTP $HTTP_CODE)"
