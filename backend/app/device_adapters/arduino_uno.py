@@ -59,9 +59,7 @@ class ArduinoUnoAdapter(BaseDeviceAdapter):
             warnings.append("Arduino Uno release binary should have .hex Intel HEX extension")
 
         # Check port availability
-        dev_port = None
-        if device.device_metadata and "serial_port" in device.device_metadata:
-            dev_port = device.device_metadata["serial_port"]
+        dev_port = device.serial_port or (device.metadata_extra.get("serial_port") if device.metadata_extra else None)
 
         ports = self.discover_serial_ports()
         if dev_port and dev_port not in ports and not settings.MOCK_MODE:
@@ -88,13 +86,13 @@ class ArduinoUnoAdapter(BaseDeviceAdapter):
                 )
 
                 # Determine serial port
-                serial_port = "/dev/ttyACM0"
-                if device.device_metadata and "serial_port" in device.device_metadata:
-                    serial_port = device.device_metadata["serial_port"]
-                else:
+                serial_port = device.serial_port or (device.metadata_extra.get("serial_port") if device.metadata_extra else None)
+                if not serial_port:
                     discovered = self.discover_serial_ports()
                     if discovered:
                         serial_port = discovered[0]
+                    else:
+                        serial_port = "/dev/ttyUSB0" if os.path.exists("/dev/ttyUSB0") else "/dev/ttyACM0"
 
                 avrdude_bin = shutil.which(settings.AVRDUDE_PATH) or shutil.which("avrdude")
 

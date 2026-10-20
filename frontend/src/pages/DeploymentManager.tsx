@@ -111,8 +111,9 @@ export const DeploymentManager: React.FC = () => {
         selectedRelease,
         preflightData.confirmation_token
       );
-      if (res.jobs && res.jobs.length > 0) {
-        setActiveJobId(res.jobs[0].id);
+      const jobs = Array.isArray(res) ? res : ((res as any)?.jobs || []);
+      if (jobs.length > 0) {
+        setActiveJobId(jobs[0].id);
       }
       setPreflightData(null);
       loadData();
@@ -132,7 +133,10 @@ export const DeploymentManager: React.FC = () => {
     }
   };
 
-  const activeJob = deployments.find((d) => d.id === activeJobId) || deployments.find((d) => !['success', 'failed', 'cancelled'].includes(d.state));
+  const activeJob =
+    deployments.find((d) => d.id === activeJobId) ||
+    deployments.find((d) => !['success', 'failed', 'cancelled'].includes(d.state)) ||
+    (deployments.length > 0 ? deployments[0] : undefined);
 
   const getStepStatus = (stepName: string, currentState: string) => {
     const stepIdx = DEPLOYMENT_STEPS.indexOf(stepName);
@@ -222,6 +226,13 @@ export const DeploymentManager: React.FC = () => {
               );
             })}
           </div>
+
+          {activeJob.failure_reason && (
+            <div className="mt-4 p-3 bg-rose-950/70 border border-rose-800 rounded-xl text-rose-300 text-xs flex items-center gap-2">
+              <XCircle className="w-4 h-4 shrink-0 text-rose-400" />
+              <span><strong>Deployment Error:</strong> {activeJob.failure_reason}</span>
+            </div>
+          )}
         </div>
       )}
 
