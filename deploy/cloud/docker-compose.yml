@@ -1,0 +1,51 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: edgefleet_cloud
+      POSTGRES_USER: edgefleet
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-edgefleet_cloud_secret}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U edgefleet -d edgefleet_cloud"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ../../backend
+      dockerfile: ../deploy/cloud/Dockerfile
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env.cloud
+    environment:
+      DATABASE_URL: postgresql+asyncpg://edgefleet:${POSTGRES_PASSWORD:-edgefleet_cloud_secret}@db:5432/edgefleet_cloud
+    volumes:
+      - cloud_storage:/app/firmware_storage
+    expose:
+      - "8000"
+
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx-cloud.conf:/etc/nginx/conf.d/default.conf:ro
+      - certs:/etc/letsencrypt
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  cloud_storage:
+  certs:

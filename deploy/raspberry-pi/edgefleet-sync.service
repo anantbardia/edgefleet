@@ -1,0 +1,21 @@
+[Unit]
+Description=EdgeFleet Cloud Synchronization Worker Service
+After=network.target edgefleet-backend.service
+Wants=edgefleet-backend.service
+
+[Service]
+Type=simple
+User=edgefleet
+Group=edgefleet
+WorkingDirectory=/opt/edgefleet/backend
+EnvironmentFile=/opt/edgefleet/.env
+ExecStart=/opt/edgefleet/.venv/bin/python -m app.services.cloud_sync
+Restart=on-failure
+RestartSec=15s
+
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,75 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+build/
+.eggs/
+*.whl
+
+!frontend/dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Database
+*.db
+*.sqlite3
+
+# Node
+node_modules/
+frontend/.vite/
+
+# Firmware build artifacts
+firmware/esp32/build/
+firmware/esp32/managed_components/
+firmware/arduino_uno/build/
+
+# Uploaded firmware storage
+firmware_storage/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# mypy
+.mypy_cache/
+
+# ruff
+.ruff_cache/
+
+# pytest
+.pytest_cache/
+
+# Alembic
+backend/alembic/versions/__pycache__/
+
+# Backups
+backups/

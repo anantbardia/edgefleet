@@ -1,0 +1,24 @@
+[Unit]
+Description=EdgeFleet IoT Gateway Backend Service
+After=network.target mosquitto.service
+Wants=mosquitto.service
+
+[Service]
+Type=simple
+User=edgefleet
+Group=edgefleet
+WorkingDirectory=/opt/edgefleet/backend
+EnvironmentFile=/opt/edgefleet/.env
+ExecStart=/opt/edgefleet/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 2
+Restart=on-failure
+RestartSec=5s
+LimitNOFILE=65536
+
+# Security Sandboxing
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

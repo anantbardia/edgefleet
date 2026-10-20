@@ -1,0 +1,13 @@
+board_manager:
+  additional_urls:
+    - https://downloads.arduino.cc/packages/package_index.json
+daemon:
+  port: "50051"
+directories:
+  data: ./arduino_data
+  downloads: ./arduino_cache
+  user: ./arduino_user
+logging:
+  file: ""
+  format: text
+  level: info
