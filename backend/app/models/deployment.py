@@ -29,7 +29,7 @@ TERMINAL_STATES = {"success", "failed", "cancelled", "recovery_required"}
 
 # Valid state transitions
 VALID_TRANSITIONS = {
-    "queued": {"preflight", "cancelled"},
+    "queued": {"preflight", "cancelled", "failed"},
     "preflight": {"transferring", "failed", "cancelled"},
     "transferring": {"verifying", "failed", "cancelled"},
     "verifying": {"installing", "failed", "cancelled"},

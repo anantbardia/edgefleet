@@ -70,15 +70,17 @@ class DeploymentService:
         failure_reason: str | None = None,
     ) -> DeploymentJob:
         """Enforce state machine transitions, record audit entry, and broadcast."""
-        old_state = job.state
+        old_state = (job.state or "").lower()
+        target_state = new_state.lower()
 
-        if new_state not in VALID_TRANSITIONS.get(old_state, []):
+        allowed = {s.lower() for s in VALID_TRANSITIONS.get(old_state, set())}
+        if target_state not in allowed:
             msg = f"Invalid state transition from {old_state} to {new_state}"
             logger.error(msg)
             raise ValueError(msg)
 
         now = datetime.now(timezone.utc)
-        job.state = new_state
+        job.state = target_state
         if details:
             existing = job.progress_details or {}
             existing.update(details)
@@ -143,15 +145,23 @@ class DeploymentService:
             if not job or job.state in TERMINAL_STATES:
                 return
 
-            dev_res = await db.execute(select(Device).where(Device.device_id == job.device_id))
+            dev_res = await db.execute(
+                select(Device).where(
+                    (Device.device_id == job.device_id) | (Device.id == job.device_id)
+                )
+            )
             device = dev_res.scalar_one_or_none()
 
-            rel_res = await db.execute(select(FirmwareRelease).where(FirmwareRelease.id == job.release_id))
+            rel_res = await db.execute(
+                select(FirmwareRelease).where(
+                    (FirmwareRelease.id == job.release_id) | (FirmwareRelease.version == job.release_id)
+                )
+            )
             release = rel_res.scalar_one_or_none()
 
             if not device or not release:
                 await self.transition_state(
-                    db, job, "FAILED", None, "Associated device or firmware release not found"
+                    db, job, "failed", None, "Associated device or firmware release not found"
                 )
                 return
 
@@ -159,7 +169,7 @@ class DeploymentService:
 
             # Move to PREFLIGHT
             try:
-                await self.transition_state(db, job, "PREFLIGHT", {"stage": "preflight_checks"}, None)
+                await self.transition_state(db, job, "preflight", {"stage": "preflight_checks"}, None)
                 compat, warnings = await adapter.preflight_check(device, release)
                 if not compat:
                     err = f"Preflight failed: {'; '.join(warnings)}"
