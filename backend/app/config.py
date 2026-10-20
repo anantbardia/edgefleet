@@ -3,6 +3,7 @@
 from pathlib import Path
 from typing import List
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
 _BACKEND_DIR = Path(__file__).resolve().parent.parent
@@ -32,6 +33,18 @@ class Settings(BaseSettings):
 
     # ── Database ─────────────────────────────────────────────────────────
     DATABASE_URL: str = "sqlite+aiosqlite:///./edgefleet.db"
+
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def ensure_async_driver(cls, v: str) -> str:
+        if isinstance(v, str):
+            if v.startswith("sqlite:///") and not v.startswith("sqlite+aiosqlite:///"):
+                return v.replace("sqlite:///", "sqlite+aiosqlite:///", 1)
+            elif v.startswith("sqlite://") and not v.startswith("sqlite+aiosqlite://"):
+                return v.replace("sqlite://", "sqlite+aiosqlite://", 1)
+            elif v.startswith("postgresql://") and not v.startswith("postgresql+asyncpg://"):
+                return v.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return v
 
     # ── MQTT ─────────────────────────────────────────────────────────────
     MQTT_HOST: str = "localhost"
