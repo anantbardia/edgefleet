@@ -1,4 +1,5 @@
 # EdgeFleet: Presentation Slide Deck (8 Core Slides)
+### *Includes System Block Diagrams, Flow Diagrams & AI Image Prompts*
 
 ---
 
@@ -8,16 +9,17 @@
 **The Challenge: Managing & Updating Distributed IoT Microcontrollers**
 
 ### Key Takeaway
-Remote microcontrollers are hard to reach, risky to update, and vulnerable to catastrophic failure ("bricking").
+Remote microcontrollers are physically inaccessible, risky to update, and vulnerable to permanent failure ("bricking").
 
 ### Slide Content (Bullet Points)
-- **Physically Inaccessible Hardware**: IoT nodes are installed in remote, hazardous, or elevated locations (factory machinery, agricultural fields, utility poles) where physical maintenance is costly and impractical.
-- **The "Bricking" Risk**: A dropped network packet, power cut, or corrupted binary during a firmware flash can leave a microcontroller permanently disabled, requiring on-site replacement.
-- **Heterogeneous Environments**: Fleets consist of mixed hardware—modern 32-bit Wi-Fi microcontrollers (**ESP32-C3 Mini**) alongside rugged 8-bit industrial controllers (**Arduino Uno**).
-- **Single-Point Cloud Vulnerability**: Cloud-only IoT platforms (Blynk, ThingSpeak, AWS IoT) require constant internet, incur recurring subscription costs, and fail when local network connectivity drops.
+- **Physically Inaccessible Hardware**: Nodes deployed in high factory ceilings, agricultural fields, or utility poles where physical access is expensive or impossible.
+- **The "Bricking" Disaster**: An interrupted flash, power dip, or corrupt binary leaves the microcontroller permanently non-bootable, requiring manual chip replacement.
+- **Heterogeneous Environments**: Fleets mix disparate hardware—modern 32-bit Wi-Fi microcontrollers (**ESP32-C3 Mini**) alongside rugged 8-bit industrial controllers (**Arduino Uno**).
+- **Single-Point Cloud Failures**: Cloud-only IoT platforms (Blynk, AWS IoT, ThingSpeak) demand constant internet, incur recurring fees, and fail when local network connectivity drops.
 
-### Visual Recommendation
-- Contrast graphic: An engineer with a ladder and laptop cable vs. a central dashboard sending a wireless update signal.
+### AI Image Generation Prompt
+> *Prompt for Midjourney / DALL-E / Nano:*  
+> `"Minimalist cinematic 3D illustration of an industrial factory floor with a robotic arm and high utility poles. In the background, a technician is holding a laptop with dangling USB cables looking frustrated. A faint red holographic warning symbol floats above an embedded sensor node. Dark slate gray and navy blue corporate tech aesthetic, clean lighting, 8k resolution, isometric perspective --ar 16:9"`
 
 ---
 
@@ -27,82 +29,130 @@ Remote microcontrollers are hard to reach, risky to update, and vulnerable to ca
 **EdgeFleet: Edge-Native Fleet Management & Safe FOTA Platform**
 
 ### Key Takeaway
-A local edge gateway that unifies heterogeneous microcontrollers with safe remote updates and real-time observability.
+A sovereign on-premise gateway that unifies heterogeneous microcontrollers with atomic remote updates and real-time observability.
 
 ### Slide Content (Bullet Points)
-- **Autonomous Local Gateway**: Powered by a Raspberry Pi 4 operating on-premise, allowing full fleet management even without public internet connectivity.
-- **Multi-Architecture Support**: Centrally manages both wireless **ESP32-C3 Mini** nodes (via Wi-Fi) and wired **Arduino Uno** nodes (via USB serial).
+- **Autonomous Local Gateway**: Powered by a Raspberry Pi 4 operating on-site, managing fleet devices autonomously even during complete internet blackouts.
+- **Multi-Architecture Support**: Centrally orchestrates both wireless **ESP32-C3 Mini** nodes (via Wi-Fi) and wired **Arduino Uno** nodes (via USB serial).
 - **Fail-Safe Firmware Over-The-Air (FOTA)**: Atomic updates with preflight hardware checks and automatic rollback protection.
-- **Real-Time Web Dashboard**: A single browser-based interface for telemetry monitoring, device health tracking, and 1-click deployments.
+- **Real-Time Web Dashboard**: A single browser-based interface for live telemetry streaming, device status tracking, and 1-click deployments.
 
-### Visual Recommendation
-- Diagram showing the **Raspberry Pi Gateway** in the center communicating with **ESP32-C3** nodes over Wi-Fi and **Arduino Uno** nodes over USB, with a browser interface connected to the gateway.
+### AI Image Generation Prompt
+> *Prompt for Midjourney / DALL-E / Nano:*  
+> `"A sleek, modern edge IoT gateway hub device glowing with soft cyan and green LED status rings on an industrial server table. Glowing wireless signal waves radiate outward to small nearby microcontrollers and sensors. Clean high-tech aesthetic, subtle glassmorphism reflections, minimalist dark studio background, futuristic enterprise technology --ar 16:9"`
 
 ---
 
-## Slide 3: System Architecture — 3-Tier Edge-Native Design
+## Slide 3: System Architecture — 3-Tier Layered Hierarchy
 
 ### Slide Title
 **System Architecture: 3-Tier Layered Hierarchy**
 
 ### Key Takeaway
-Clean separation between operator presentation, edge gateway orchestration, and physical microcontroller execution.
+Clean architectural separation between operator presentation, edge gateway orchestration, and physical microcontroller execution.
 
 ### Slide Content (Bullet Points)
 - **Tier 1: Operator Presentation Layer (Frontend)**
   - Web dashboard built with **React 18** and **TypeScript**.
-  - Bidirectional **WebSockets** for sub-second telemetry and live deployment tracking.
+  - Bidirectional **WebSockets** for live sub-second telemetry and deployment progress.
 - **Tier 2: Edge Gateway Controller (Raspberry Pi 4)**
-  - **FastAPI Engine**: Asynchronous core handling API requests, RBAC security, and deployment pipelines.
-  - **Mosquitto MQTT Broker**: Lightweight pub/sub messaging engine for high-frequency telemetry.
-  - **Local SQLite Database (WAL Mode)**: High-speed concurrent local storage for fleet logs and firmware releases.
+  - **FastAPI Engine**: Asynchronous core handling API requests, RBAC security, and deployment jobs.
+  - **Mosquitto MQTT Broker**: High-throughput message bus for lightweight telemetry and commands.
+  - **Local SQLite Database (WAL Mode)**: Fast concurrent local storage for telemetry logs and firmware binaries.
 - **Tier 3: Distributed Edge Hardware (Physical Nodes)**
-  - **ESP32-C3 Mini**: 32-bit RISC-V core with Wi-Fi, dual-partition A/B flash, and onboard status LEDs.
+  - **ESP32-C3 Mini**: 32-bit RISC-V core with Wi-Fi, dual A/B flash partitions, and status LEDs.
   - **Arduino Uno**: 8-bit AVR ATmega328P connected via USB serial for rugged sensing.
 
-### Visual Recommendation
-- 3 horizontal layer blocks:
-  - Top Block: `Web Dashboard (React + WebSockets)`
-  - Middle Block: `Raspberry Pi 4 Gateway (FastAPI + Mosquitto + SQLite)`
-  - Bottom Block: `Edge Nodes (ESP32-C3 Mini [Wi-Fi] + Arduino Uno [USB])`
+### System Architecture Block Diagram
+
+```mermaid
+graph TD
+    subgraph Tier1 ["Tier 1: Operator Presentation Layer"]
+        UI["Web Dashboard (React 18 + TypeScript)<br/>Real-Time Fleet View & Binary Registry"]
+    end
+
+    subgraph Tier2 ["Tier 2: Raspberry Pi 4 Edge Gateway"]
+        Nginx["Nginx Reverse Proxy (:80)"]
+        API["FastAPI Orchestrator (Async Python 3.11)"]
+        DB[("SQLite Database (WAL Mode)<br/>Devices • Releases • Deployments")]
+        MQTT["Mosquitto MQTT Broker (:1883)<br/>Telemetry & Command Bus"]
+        ESPAdapter["ESP32 OTA Adapter<br/>(HTTP Streaming Engine)"]
+        UnoAdapter["Arduino Uno Adapter<br/>(avrdude STK500 Serial Daemon)"]
+    end
+
+    subgraph Tier3 ["Tier 3: Physical Edge Nodes"]
+        C3Node["ESP32-C3 Mini Node<br/>32-bit RISC-V | Wi-Fi 802.11b/g/n<br/>Dual-Partition A/B Flash | GPIO 8/7 LED"]
+        UnoNode["Arduino Uno Hardware Node<br/>8-bit AVR ATmega328P | USB Serial<br/>Optiboot Bootloader @ 115200 Baud"]
+    end
+
+    UI <==>|HTTPS / WebSockets| Nginx
+    Nginx --> API
+    API <--> DB
+    API <--> MQTT
+    API --> ESPAdapter
+    API --> UnoAdapter
+
+    MQTT <==>|MQTT Topics (Port 1883)| C3Node
+    ESPAdapter ==>|HTTP Binary Stream| C3Node
+    UnoAdapter ==>|USB Serial /dev/ttyACM0| UnoNode
+```
+
+### AI Image Generation Prompt
+> *Prompt for Midjourney / DALL-E / Nano:*  
+> `"3D exploded isometric diagram of a 3-layer system architecture. Top layer shows a glowing web dashboard interface floating in glass. Middle layer shows a circuit board with a Raspberry Pi 4 chip surrounded by micro-services data rings. Bottom layer shows physical microcontroller chips (ESP32 and Arduino) interconnected with thin glowing fiber-optic conduits. Cyan and emerald green accents on dark obsidian background --ar 16:9"`
 
 ---
 
-## Slide 4: System Architecture Flow — How Data & Updates Move
+## Slide 4: System Architecture Flow — Data Ingestion & FOTA Execution Pipeline
 
 ### Slide Title
-**System Architecture Flow: Data Ingestion & FOTA Execution Pipeline**
+**System Architecture Flow: Step-by-Step Data & FOTA Pipeline**
 
 ### Key Takeaway
-Optimized dual-channel communication: lightweight MQTT for commands and telemetry; high-throughput HTTP for firmware streaming.
+Optimized dual-channel communication: lightweight MQTT for commands and telemetry; high-throughput local HTTP for firmware streaming.
 
 ### Slide Content (Bullet Points)
-1. **Telemetry Pipeline**: Microcontrollers publish sensor metrics to MQTT broker every 5s ➔ Gateway broadcasts to Dashboard via WebSockets.
-2. **Preflight Safety Gate**: Gateway validates firmware target compatibility before dispatch (prevents flashing Arduino code onto an ESP32).
-3. **Command Dispatch**: Gateway dispatches an update trigger command containing SHA-256 hash and download URL via MQTT.
+1. **Continuous Telemetry Loop**: Microcontrollers publish sensor data to MQTT broker every 5s ➔ Gateway broadcasts to Dashboard via WebSockets.
+2. **Preflight Compatibility Gate**: Gateway verifies MCU family, target board variant, and connection state before dispatching any payload.
+3. **Command Dispatch**: Gateway dispatches an update command containing SHA-256 hash and download URL via MQTT.
 4. **Local HTTP Binary Stream**: ESP32-C3 downloads the 1.1 MB binary directly from the local gateway IP (`10.202.94.199`) in under 4 seconds.
-5. **Flash & Self-Test**: ESP32 verifies checksum, reboots into the new firmware, and reports online status.
+5. **Flash & Self-Test**: ESP32 writes to inactive partition, verifies SHA-256 checksum, reboots, and reports online status.
 
-### Flow Diagram for Slide
+### System Architecture Flow Diagram
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Operator as Fleet Operator
+    participant UI as Dashboard (React)
+    participant Gateway as Gateway API (FastAPI)
+    participant MQTT as Mosquitto Broker
+    participant Node as ESP32-C3 Mini Node
+
+    Note over Node,Gateway: Telemetry Channel (Continuous Every 5s)
+    Node->>MQTT: Publish telemetry (temp, free heap, RSSI)
+    MQTT->>Gateway: Relay telemetry packet
+    Gateway-->>UI: WebSocket live push to charts
+
+    Note over Operator,Node: FOTA Execution Channel (Triggered by Operator)
+    Operator->>UI: Select Release v1.1.0 & Click Deploy
+    UI->>Gateway: POST /api/deployments (Target: esp32-c3-mini)
+    Gateway->>Gateway: Preflight Check (MCU family, board variant, online status)
+    Gateway->>MQTT: Publish command: {"cmd": "ota_update", "url": "http://10.202.94.199/api/firmware/.../download"}
+    MQTT->>Node: Deliver OTA command packet
+    Node->>Gateway: HTTP GET /api/firmware/{id}/download
+    Gateway-->>Node: Stream 1.1 MB binary chunks directly over Wi-Fi
+    Node->>Node: Write stream into inactive partition (ota_1)
+    Node->>Node: Verify SHA-256 cryptographic checksum
+    Node->>Node: Switch boot partition & ESP.restart()
+    Node->>MQTT: Publish online announcement (Version 1.1.0)
+    MQTT->>Gateway: Receive confirmation -> Mark Deployment SUCCESS
+    Gateway-->>UI: WebSocket broadcast -> Status: SUCCESS
 ```
-[ Operator Dashboard ]
-         │  1. Initiate Deployment (HTTPS/WSS)
-         ▼
-[ Raspberry Pi 4 Gateway ]
-   ├── 2. Preflight Safety Check (Validates board & binary)
-   ├── 3. Sends Trigger Command via MQTT (Port 1883)
-   │               │
-   │               ▼
-   │      [ ESP32-C3 Mini Node ]
-   │               │
-   └── 4. Streams 1.1 MB Binary via local HTTP (Port 80)
-                   │
-                   ▼
-          [ ESP32-C3 Mini Node ]
-          5. Writes to Inactive Partition
-          6. Verifies SHA-256 Checksum
-          7. Reboots into New Version & Confirms Online
-```
+
+### AI Image Generation Prompt
+> *Prompt for Midjourney / DALL-E / Nano:*  
+> `"High-tech data transmission flow diagram. Glowing particles flow along two distinct pipes: an orange glowing circuit line representing lightweight telemetry packets, and a thick emerald-green light beam representing high-speed binary firmware transmission between a gateway computer and a small wireless sensor board. Sleek dark futuristic aesthetic, clean infographic style --ar 16:9"`
 
 ---
 
@@ -116,7 +166,7 @@ Zero risk of bricking: the active firmware is never overwritten until the new ve
 
 ### Slide Content (Bullet Points)
 - **Preflight Compatibility Gate**:
-  - Automatically matches MCU family and board variant before deployment dispatch.
+  - Automatically matches MCU family and board variant before dispatch (prevents flashing Arduino code onto an ESP32).
 - **Dual A/B Partition Layout**:
   - Memory is split into two independent slots: **Slot A** and **Slot B**.
   - While the device runs safely on **Slot A**, the new update streams into inactive **Slot B**.
@@ -126,10 +176,27 @@ Zero risk of bricking: the active firmware is never overwritten until the new ve
   - If a power interruption occurs during download: **Slot A remains 100% intact**.
   - If the new firmware crashes or fails to connect: The bootloader automatically rolls back to **Slot A**.
 
-### Visual Recommendation
-- Side-by-side comparison diagram:
-  - *Standard Flashing*: In-place overwrite ➔ Network drop ➔ Device dead ❌
-  - *EdgeFleet A/B*: Background write to Slot B ➔ Verify ➔ Safe Switch / Auto Rollback ✅
+### Flash Memory Dual-Partition Diagram
+
+```
+ESP32-C3 FLASH MEMORY (4 MB)
+┌─────────────────────────┬─────────────────────────┬─────────────────────────┐
+│       PARTITION A       │       PARTITION B       │        OTA DATA         │
+│         (ota_0)         │         (ota_1)         │        (otadata)        │
+│                         │                         │                         │
+│  [ ACTIVE FIRMWARE ]    │  [ INACTIVE TARGET ]    │  Active Boot Pointer    │
+│  Version 1.0.0          │  Receives v1.1.0 Stream │  Points to Slot A       │
+│  (Running Normal Ops)   │  (Safe Inactive Slot)   │  (Switches after Check) │
+└─────────────────────────┴─────────────────────────┴─────────────────────────┘
+         ▲                                                   │
+         │                                                   ▼
+         └──────── If v1.1.0 Crashes on Boot ────────────────┘
+                   Hardware Watchdog rolls back to Partition A!
+```
+
+### AI Image Generation Prompt
+> *Prompt for Midjourney / DALL-E / Nano:*  
+> `"Conceptual 3D illustration of a silicon microchip partitioned into two glowing symmetrical memory blocks labeled A and B. Block A is glowing steady cyan with a shield icon. Block B is receiving a glowing green data stream with a digital lock icon. In between them is a golden toggle switch indicating safe failover. Premium dark tech style, macro photography depth of field --ar 16:9"`
 
 ---
 
@@ -148,15 +215,16 @@ EdgeFleet provides centralized lifecycle management across diverse industrial an
 2. **Smart Agriculture & Precision Farming**:
    - Soil moisture, nutrient, and environmental sensors across acres of land.
    - Central farmhouse gateway updates irrigation schedules and sleep algorithms wirelessly.
-3. **Smart Cities & Infrastructure**:
+3. **Smart Cities & Municipal Infrastructure**:
    - Connected streetlights, automated water metering, and parking vacancy sensors.
    - Push security patches across city blocks without sending maintenance trucks.
 4. **Hazardous Environmental Monitoring**:
    - Flood detection, wildfire monitoring, and air quality nodes in dangerous or remote terrain.
    - Updates dispatched safely from a distance with zero physical contact required.
 
-### Visual Recommendation
-- 4-quadrant layout with clean icons: Factory Gear (IIoT), Crop Sprout (Agriculture), City Skyline (Smart Cities), Weather/Shield (Environment).
+### AI Image Generation Prompt
+> *Prompt for Midjourney / DALL-E / Nano:*  
+> `"A four-quadrant collage of modern smart IoT environments: top-left shows an automated robotic manufacturing line; top-right shows a lush green smart agriculture field with wireless solar sensor poles; bottom-left shows an illuminated modern smart city street with connected LED lamp posts; bottom-right shows a mountain river environmental monitoring station. Cohesive futuristic aesthetic, dark tech tone with vibrant glowing accents --ar 16:9"`
 
 ---
 
@@ -182,6 +250,10 @@ Production-grade open-source technologies integrated into a lightweight, cost-ef
 - **Zero Cloud Costs**: Operates independently on local network; optional public access via free Cloudflare Tunnel without port-forwarding.
 - **Real Working Prototype**: Live physical demonstration with active telemetry streaming and over-the-air updates.
 
+### AI Image Generation Prompt
+> *Prompt for Midjourney / DALL-E / Nano:*  
+> `"A sleek dark glassmorphism technology dashboard showing glowing modular cards with logos of Python, React, MQTT, Linux, and Raspberry Pi. In the center, a miniature glowing hardware circuit board sits on top of a frosted glass platform. Sophisticated modern UI presentation, deep purple and teal neon lighting, ultra-clean --ar 16:9"`
+
 ---
 
 ## Slide 8: Validated Results & Future Scope
@@ -205,6 +277,6 @@ A fully functional, benchmarked working prototype ready for real-world deploymen
 - **Peer-to-Peer Mesh Updates (ESP-NOW)**: Allowing Wi-Fi nodes to daisy-chain firmware to nodes located outside router range.
 - **Binary Delta Updates**: Generating binary diffs to reduce update transfer sizes from 1.1 MB to ~50 KB for cellular IoT.
 
-### Visual Recommendation
-- Left side: Green checkmark badges for current working achievements.
-- Right side: Forward-arrow milestone cards for future enhancements.
+### AI Image Generation Prompt
+> *Prompt for Midjourney / DALL-E / Nano:*  
+> `"Split-screen futuristic concept art. On the left side, a digital dashboard displays bright green checkmarks over a real microcontroller, indicating operational success. On the right side, an abstract glowing mesh network of interconnected nodes expands into a vast digital skyline, symbolizing future scalability and cryptographic security. Crisp lighting, 8k resolution, cinematic wide angle --ar 16:9"`
