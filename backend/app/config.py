@@ -5,6 +5,16 @@ from typing import List
 
 from pydantic_settings import BaseSettings
 
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
+_PROJECT_ROOT = _BACKEND_DIR.parent
+_ENV_FILE = None
+if (_PROJECT_ROOT / ".env").is_file():
+    _ENV_FILE = str(_PROJECT_ROOT / ".env")
+elif (_BACKEND_DIR / ".env").is_file():
+    _ENV_FILE = str(_BACKEND_DIR / ".env")
+elif Path("/opt/edgefleet/.env").is_file():
+    _ENV_FILE = "/opt/edgefleet/.env"
+
 
 class Settings(BaseSettings):
     """EdgeFleet application settings.
@@ -93,7 +103,7 @@ class Settings(BaseSettings):
     def is_production(self) -> bool:
         return self.ENVIRONMENT == "production"
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
+    model_config = {"env_file": _ENV_FILE, "env_file_encoding": "utf-8", "extra": "ignore"}
 
 
 settings = Settings()
