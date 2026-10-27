@@ -12,6 +12,7 @@ from pathlib import Path
 backend_path = Path(__file__).resolve().parent.parent / "backend"
 sys.path.insert(0, str(backend_path))
 
+from sqlalchemy import select
 from app.config import settings
 from app.core.security import get_password_hash
 from app.database.session import async_session_factory, init_db
@@ -67,7 +68,16 @@ async def seed_data():
         )
 
         for u in [admin_user, operator_user, viewer_user]:
-            db.add(u)
+            res = await db.execute(select(User).where(User.email == u.email))
+            existing = res.scalar_one_or_none()
+            if existing:
+                existing.hashed_password = u.hashed_password
+                existing.role = u.role
+                existing.is_active = True
+                if u.email == "admin@edgefleet.local":
+                    admin_user.id = existing.id
+            else:
+                db.add(u)
         await db.commit()
 
         print("Seeding Devices...")
@@ -140,7 +150,12 @@ async def seed_data():
 
         devices = [dev1, dev2, dev3, dev4]
         for d in devices:
-            db.add(d)
+            res = await db.execute(select(Device).where(Device.device_id == d.device_id))
+            existing_d = res.scalar_one_or_none()
+            if existing_d:
+                d.id = existing_d.id
+            else:
+                db.add(d)
         await db.commit()
 
         print("Seeding Firmware Releases with real disk files...")
@@ -199,7 +214,12 @@ async def seed_data():
         )
 
         for r in [rel1, rel2, rel3]:
-            db.add(r)
+            res = await db.execute(select(FirmwareRelease).where(FirmwareRelease.version == r.version, FirmwareRelease.mcu_family == r.mcu_family))
+            existing_r = res.scalar_one_or_none()
+            if existing_r:
+                r.id = existing_r.id
+            else:
+                db.add(r)
         await db.commit()
 
         print("Seeding Historical Telemetry...")
