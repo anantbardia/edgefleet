@@ -12,7 +12,7 @@ router = APIRouter(tags=["Health"])
 _start_time = time.monotonic()
 
 
-@router.get("/health")
+@router.api_route("/health", methods=["GET", "HEAD"])
 async def health_check():
     """Health check — no authentication required."""
     uptime = time.monotonic() - _start_time
