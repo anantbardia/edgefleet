@@ -98,7 +98,7 @@ export const AlertsLogs: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-fleet-border gap-6 text-xs font-medium">
+      <div className="flex border-b border-fleet-border gap-4 sm:gap-6 text-xs font-medium overflow-x-auto whitespace-nowrap pb-0.5">
         <button
           onClick={() => setActiveTab('alerts')}
           className={`pb-3 flex items-center gap-2 border-b-2 transition-all ${
@@ -142,7 +142,8 @@ export const AlertsLogs: React.FC = () => {
           </div>
 
           <div className="glass-panel rounded-2xl border border-fleet-border overflow-hidden">
-            <table className="w-full text-left text-xs">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
               <thead className="bg-[#0c1424] text-slate-400 font-semibold uppercase tracking-wider border-b border-fleet-border">
                 <tr>
                   <th className="py-3 px-6">Severity</th>
@@ -213,6 +214,7 @@ export const AlertsLogs: React.FC = () => {
                 )}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       )}
@@ -220,7 +222,8 @@ export const AlertsLogs: React.FC = () => {
       {/* TAB 2: Audit Logs */}
       {activeTab === 'audit' && (
         <div className="glass-panel rounded-2xl border border-fleet-border overflow-hidden">
-          <table className="w-full text-left text-xs">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
             <thead className="bg-[#0c1424] text-slate-400 font-semibold uppercase tracking-wider border-b border-fleet-border">
               <tr>
                 <th className="py-3 px-6">Timestamp</th>
@@ -256,6 +259,7 @@ export const AlertsLogs: React.FC = () => {
               )}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>

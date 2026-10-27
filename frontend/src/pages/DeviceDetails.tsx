@@ -230,7 +230,7 @@ export const DeviceDetails: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-fleet-border gap-6 text-xs font-medium">
+      <div className="flex border-b border-fleet-border gap-4 sm:gap-6 text-xs font-medium overflow-x-auto whitespace-nowrap pb-0.5">
         <button
           onClick={() => setActiveTab('telemetry')}
           className={`pb-3 flex items-center gap-2 border-b-2 transition-all ${
@@ -485,50 +485,52 @@ export const DeviceDetails: React.FC = () => {
       {/* TAB 3: Deployment History */}
       {activeTab === 'deployments' && (
         <div className="glass-panel rounded-2xl border border-fleet-border overflow-hidden">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-[#0c1424] text-slate-400 font-semibold uppercase tracking-wider border-b border-fleet-border">
-              <tr>
-                <th className="py-3 px-6">Deployment ID</th>
-                <th className="py-3 px-6">Target Version</th>
-                <th className="py-3 px-6">Outcome State</th>
-                <th className="py-3 px-6">Execution Timestamp</th>
-                <th className="py-3 px-6">Evidence Check</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-fleet-border/60">
-              {deployments.length === 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-[#0c1424] text-slate-400 font-semibold uppercase tracking-wider border-b border-fleet-border">
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-slate-500">
-                    No past firmware deployments recorded for this node.
-                  </td>
+                  <th className="py-3 px-6">Deployment ID</th>
+                  <th className="py-3 px-6">Target Version</th>
+                  <th className="py-3 px-6">Outcome State</th>
+                  <th className="py-3 px-6">Execution Timestamp</th>
+                  <th className="py-3 px-6">Evidence Check</th>
                 </tr>
-              ) : (
-                deployments.map((job) => (
-                  <tr key={job.id} className="hover:bg-fleet-cardHover/50 transition-colors">
-                    <td className="py-3.5 px-6 font-mono font-medium text-slate-300">{job.id.slice(0, 8)}...</td>
-                    <td className="py-3.5 px-6 font-mono text-cyan-400 font-bold">v{job.target_version}</td>
-                    <td className="py-3.5 px-6">
-                      <span
-                        className={`inline-block px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${
-                          job.state === 'success'
-                            ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
-                            : job.state === 'failed'
-                            ? 'bg-rose-950 text-rose-300 border border-rose-800'
-                            : 'bg-amber-950 text-amber-300 border border-amber-800'
-                        }`}
-                      >
-                        {job.state}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-6 text-slate-400">{new Date(job.started_at).toLocaleString()}</td>
-                    <td className="py-3.5 px-6 font-mono text-slate-400 text-[11px]">
-                      {job.verification_evidence ? 'Verified SHA256' : '—'}
+              </thead>
+              <tbody className="divide-y divide-fleet-border/60">
+                {deployments.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-12 text-center text-slate-500">
+                      No past firmware deployments recorded for this node.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  deployments.map((job) => (
+                    <tr key={job.id} className="hover:bg-fleet-cardHover/50 transition-colors">
+                      <td className="py-3.5 px-6 font-mono font-medium text-slate-300">{job.id.slice(0, 8)}...</td>
+                      <td className="py-3.5 px-6 font-mono text-cyan-400 font-bold">v{job.target_version}</td>
+                      <td className="py-3.5 px-6">
+                        <span
+                          className={`inline-block px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${
+                            job.state === 'success'
+                              ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                              : job.state === 'failed'
+                              ? 'bg-rose-950 text-rose-300 border border-rose-800'
+                              : 'bg-amber-950 text-amber-300 border border-amber-800'
+                          }`}
+                        >
+                          {job.state}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-6 text-slate-400">{new Date(job.started_at).toLocaleString()}</td>
+                      <td className="py-3.5 px-6 font-mono text-slate-400 text-[11px]">
+                        {job.verification_evidence ? 'Verified SHA256' : '—'}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

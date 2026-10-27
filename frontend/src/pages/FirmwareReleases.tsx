@@ -248,7 +248,7 @@ export const FirmwareReleases: React.FC = () => {
       {/* Upload Firmware Modal */}
       {showUploadModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0c1424] border border-fleet-border rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+          <div className="bg-[#0c1424] border border-fleet-border rounded-2xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <h2 className="text-lg font-bold text-white mb-1 flex items-center gap-2">
               <Upload className="w-5 h-5 text-cyan-400" />
               <span>Upload Firmware Release</span>
