@@ -38,7 +38,15 @@ class Settings(BaseSettings):
     @classmethod
     def ensure_async_driver(cls, v: str) -> str:
         if isinstance(v, str):
-            if v.startswith("sqlite:///") and not v.startswith("sqlite+aiosqlite:///"):
+            if v in ("sqlite+aiosqlite:///./edgefleet.db", "sqlite:///./edgefleet.db"):
+                backend_dir = Path(__file__).resolve().parent.parent
+                root_dir = backend_dir.parent
+                if (root_dir / "edgefleet.db").exists():
+                    db_path = (root_dir / "edgefleet.db").resolve()
+                else:
+                    db_path = (backend_dir / "edgefleet.db").resolve()
+                return f"sqlite+aiosqlite:///{db_path.as_posix()}"
+            elif v.startswith("sqlite:///") and not v.startswith("sqlite+aiosqlite:///"):
                 return v.replace("sqlite:///", "sqlite+aiosqlite:///", 1)
             elif v.startswith("sqlite://") and not v.startswith("sqlite+aiosqlite://"):
                 return v.replace("sqlite://", "sqlite+aiosqlite://", 1)
