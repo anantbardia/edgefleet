@@ -81,7 +81,7 @@ class ESP32OTAAdapter(BaseDeviceAdapter):
                             s.connect(("8.8.8.8", 80))
                             host = s.getsockname()[0]
                     except Exception:
-                        host = "10.202.94.199"
+                        host = "10.162.65.199"
                 gateway_base = f"http://{host}"
             firmware_url = f"{gateway_base}/api/firmware/{release.id}/download"
 

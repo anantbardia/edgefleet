@@ -13,7 +13,7 @@ This sketch enables your **ESP32-C3** microcontroller to connect to the EdgeFlee
    ```cpp
    const char* WIFI_SSID     = "YOUR_WIFI_SSID";
    const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
-   const char* GATEWAY_HOST  = "10.202.94.199"; // IP of your Raspberry Pi Gateway
+   const char* GATEWAY_HOST  = "10.162.65.199"; // IP of your Raspberry Pi Gateway
    const char* DEVICE_ID     = "esp32-c3-01";
    const char* BOARD_VARIANT = "ESP32-C3";
    const char* CURRENT_VERSION = "1.0.0";

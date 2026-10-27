@@ -21,7 +21,7 @@ const char* WIFI_SSID         = "YOUR_WIFI_SSID";
 const char* WIFI_PASSWORD     = "YOUR_WIFI_PASSWORD";
 
 // EdgeFleet Gateway details (Raspberry Pi Wi-Fi IP)
-const char* GATEWAY_HOST      = "10.202.94.199"; 
+const char* GATEWAY_HOST      = "10.162.65.199"; 
 const int   MQTT_PORT         = 1883;
 
 // Device Identity
