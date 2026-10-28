@@ -20,6 +20,7 @@ from app.mqtt.client import mqtt_client
 from app.services.cloud_sync import cloud_sync_service
 from app.services.deployment_service import deployment_service
 from app.services.device_service import device_service
+from app.services.serial_bridge import serial_bridge
 from app.websocket.manager import ws_manager
 
 logging.basicConfig(
@@ -76,11 +77,15 @@ async def lifespan(app: FastAPI):
     hb_task = asyncio.create_task(heartbeat_monitoring_loop())
     cloud_task = asyncio.create_task(cloud_sync_periodic_loop())
 
+    # Start Serial Telemetry Bridge for USB-connected nodes (Arduino Uno / cable)
+    serial_bridge.start()
+
     logger.info("EdgeFleet Gateway backend started successfully.")
 
     yield
 
     logger.info("Shutting down EdgeFleet Gateway...")
+    serial_bridge.stop()
     hb_task.cancel()
     cloud_task.cancel()
     deployment_service.stop_worker()
